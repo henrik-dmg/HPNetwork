@@ -2,14 +2,19 @@ import XCTest
 @testable import HPNetwork
 
 final class HPNetworkTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(HPNetwork().text, "Hello, World!")
+
+    func testRequest() {
+        let request = NetworkRequest<Int>(url: "https://google.com", method: .get)
+
+        Network.shared.send(request) { result in
+            switch result {
+            case .success(let test):
+                print(test)
+            case .failure(let error):
+                XCTFail(error.localizedDescription)
+            }
+        }
+
     }
 
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }
