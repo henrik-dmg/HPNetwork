@@ -8,18 +8,6 @@ public class Network {
     public static let shared = Network()
     private let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
 
-    enum NetworkError: Error {
-        case noDataOrError
-    }
-
-    struct StatusCodeError: LocalizedError {
-        let code: Int
-
-        var errorDescription: String? {
-            return "An error occurred communicating with the server. Please try again."
-        }
-    }
-
     /**
      The session that the app uses. Since it uses delegate: self, it must be declared lazy. You should never change this.
      */
@@ -29,16 +17,14 @@ public class Network {
         self.session = session
     }
 
-    // MARK: - API
     /**
-     Sends a data request and parses the result into a model. To specify the model type, you'll need to include the type in your completion block.
-     For instance:
-     ```Network.shared.send(request) { result: Result<MyModel, Error> in ```
+     Send a request and return anything which is DataConvertible. See DataConvertible.swift for a full list of types.
+     If you don't care about what's returned, you should expect: Result<Empty, Error>.
      */
     @discardableResult
-    public func send<T: NetworkRequestable>(
+    public func send<T: NetworkRequest>(
         _ request: T,
-        completion: @escaping (Result<T.ResultType, Error>) -> Void) -> NetworkTask
+        completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
     {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
@@ -49,29 +35,34 @@ public class Network {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async { [weak self] in
-            guard let `self` = self else {
-                completion(.failure(NetworkError.noDataOrError))
+            guard let session = self?.session else {
+                completion(.failure(NSError(description: "No session found, please contact developer")))
                 return
             }
 
-            let urlRequest = request.urlRequest()
+            guard let urlRequest = request.urlRequest() else {
+                completion(.failure(NSError(description: "Failed to create URLRequest")))
+                return
+            }
 
-            let task = self.session.dataTask(with: urlRequest) { data, response, error in
-                let result: Result<T.ResultType, Error>
+            let task = session.dataTask(with: urlRequest) { data, response, error in
+                let result: Result<T.Output, Error>
 
                 if let error = error {
                     result = .failure(error)
                 } else if let error = Network.error(from: response, with: request) {
                     result = .failure(error)
-                } else if let data = data {
+                } else if let data = data, let httpResponse = response as? HTTPURLResponse {
                     do {
-                        let model = try JSONDecoder().decode(T.ResultType.self, from: data)
-                        result = .success(model)
+                        let response = NetworkResponse(data: data, httpResponse: httpResponse)
+                        let input = try request.convertInput(response: response)
+                        let output = try request.convertResponse(input: input, response: response)
+                        result = .success(output)
                     } catch let error {
                         result = .failure(error)
                     }
                 } else {
-                    result = .failure(NetworkError.noDataOrError)
+                    result = .failure(NSError.unknown)
                 }
 
                 DispatchQueue.main.async {
@@ -94,7 +85,7 @@ public class Network {
     }
 
     // MARK: Helpers
-    private static func error<T: NetworkRequestable>(from response: URLResponse?, with request: T) -> Error? {
+    private static func error<T: NetworkRequest>(from response: URLResponse?, with request: T) -> Error? {
         guard let response = response as? HTTPURLResponse else {
             return nil
         }
@@ -103,7 +94,7 @@ public class Network {
         if statusCode >= 200 && statusCode <= 299 {
             return nil
         } else {
-            return StatusCodeError(code: statusCode)
+            return NSError(code: statusCode, description: "Networking returned with HTTP code \(statusCode)")
         }
     }
 
