@@ -1,3 +1,3 @@
 # HPNetwork
 
-A description of this package.
+Documentation is in progress
