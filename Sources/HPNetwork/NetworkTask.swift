@@ -6,6 +6,11 @@ public class NetworkTask {
     private var cancelled = false
     private let queue = DispatchQueue(label: "com.henrikpanhans.NetworkTask", qos: .utility)
 
+    public init(task: URLSessionTask? = nil, cancelled: Bool = false) {
+        self.task = task
+        self.cancelled = cancelled
+    }
+
     public func cancel() {
         queue.sync {
             cancelled = true
