@@ -12,7 +12,6 @@ Pod::Spec.new do |spec|
   spec.version      = "0.0.6"
   spec.summary      = "A lightweight but customisable networking stack written in Swift"
   spec.swift_version = "5.0"
-  spec.description  = "A lightweight but customisable networking stack written in Swift"
 
   spec.homepage     = "https://github.com/henrik-dmg/HPNetwork"
 
@@ -36,8 +35,15 @@ Pod::Spec.new do |spec|
   #  When using multiple platforms
   spec.ios.deployment_target = "8.0"
   spec.osx.deployment_target = "10.11"
-  # spec.watchos.deployment_target = "3.0"
+  spec.watchos.deployment_target = "3.0"
   spec.tvos.deployment_target = "9.0"
+
+
+  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  Specify the location from where the source should be retrieved.
+  #  Supports git, hg, bzr, svn and HTTP.
+  #
 
   spec.source       = { :git => "https://github.com/henrik-dmg/HPNetwork.git", :tag => "#{spec.version}" }
 
@@ -75,8 +81,10 @@ Pod::Spec.new do |spec|
   #  the lib prefix of their name.
   #
 
-  # spec.framework  = "SomeFramework"
-  # spec.frameworks = "SomeFramework", "AnotherFramework"
+  spec.framework = "Foundation"
+  spec.ios.framework = "UIKit"
+  spec.watchos.framework = "UIKit"
+  spec.tvos.framework = "UIKit"
 
   # spec.library   = "iconv"
   # spec.libraries = "iconv", "xml2"
