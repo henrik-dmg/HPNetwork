@@ -5,16 +5,21 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public typealias Input = Data
     public typealias Output = T
 
-    public let urlString: String
+    open var urlString: String {
+        _urlString
+    }
+
     public let requestMethod: NetworkRequestMethod = .get
     public let authentication: NetworkRequestAuthentication? = nil
 
-    public var decoder: JSONDecoder {
+    private let _urlString: String
+
+    open var decoder: JSONDecoder {
         JSONDecoder()
     }
 
     public init(urlString: String) {
-        self.urlString = urlString
+        self._urlString = urlString
     }
 
     public func convertResponse(input: Data, response: NetworkResponse) throws -> T {
