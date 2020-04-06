@@ -9,8 +9,8 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
         _urlString
     }
 
-    public let requestMethod: NetworkRequestMethod = .get
-    public let authentication: NetworkRequestAuthentication? = nil
+    public let requestMethod: NetworkRequestMethod
+    public let authentication: NetworkRequestAuthentication?
 
     private let _urlString: String
 
@@ -18,8 +18,10 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
         JSONDecoder()
     }
 
-    public init(urlString: String) {
+    public init(urlString: String, requestMethod: NetworkRequestMethod = .get, authentication: NetworkRequestAuthentication? = nil) {
         self._urlString = urlString
+        self.requestMethod = requestMethod
+        self.authentication = authentication
     }
 
     public func convertResponse(input: Data, response: NetworkResponse) throws -> T {
