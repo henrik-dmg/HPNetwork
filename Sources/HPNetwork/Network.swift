@@ -8,19 +8,12 @@ public class Network {
     public static let shared = Network()
     private let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
 
-    /**
-     The session that the app uses. Since it uses delegate: self, it must be declared lazy. You should never change this.
-     */
-    let session: URLSession
+    private let session: URLSession
 
     public init(session: URLSession = .shared) {
         self.session = session
     }
 
-    /**
-     Send a request and return anything which is DataConvertible. See DataConvertible.swift for a full list of types.
-     If you don't care about what's returned, you should expect: Result<Empty, Error>.
-     */
     @discardableResult
     public func send<T: NetworkRequest>(
         _ request: T,
@@ -36,7 +29,7 @@ public class Network {
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async { [weak self] in
             guard let session = self?.session else {
-                completion(.failure(NSError(description: "No session found, please contact developer")))
+                completion(.failure(NSError(description: "No session found")))
                 return
             }
 
@@ -84,7 +77,8 @@ public class Network {
         return networkTask
     }
 
-    // MARK: Helpers
+    // MARK: - Helpers
+
     private static func error<T: NetworkRequest>(from response: URLResponse?, with request: T) -> Error? {
         guard let response = response as? HTTPURLResponse else {
             return nil
@@ -99,6 +93,7 @@ public class Network {
     }
 
     // MARK: - File Handling
+
     private static func moveFile(from origin: URL, to destination: URL) throws {
         if FileManager.default.fileExists(atPath: destination.path) {
             try FileManager.default.removeItem(at: destination)

@@ -7,17 +7,22 @@ public protocol NetworkRequest {
 
     associatedtype Input
     associatedtype Output
+
     /**
      Generates a URLRequest from the request. This will be run on a background thread so model parsing is allowed.
      */
     func urlRequest() -> URLRequest?
 
     var urlString: String { get }
+    var requestMethod: NetworkRequestMethod { get }
+    var authentication: NetworkRequestAuthentication? { get }
 
     func convertInput(response: NetworkResponse) throws -> Input
     func convertResponse(input: Input, response: NetworkResponse) throws -> Output
 
 }
+
+// MARK: - Convenience Extensions
 
 public extension NetworkRequest {
 
@@ -26,7 +31,10 @@ public extension NetworkRequest {
             return nil
         }
 
-        return URLRequest(url: url)
+        var request = URLRequest(url: url)
+        request.httpMethod = requestMethod.rawValue
+        request.setValue(authentication?.headerString, forHTTPHeaderField: "Authorization")
+        return request
     }
 
 }
