@@ -55,6 +55,5 @@ Any call to `send(request) { result in ... }` returns an instance of `NetworkTas
 
 ## WIP
 
-[ ] Adding ability to add HTTP body data
-
-[ ] Improving the documentation
+- [ ] Adding ability to add HTTP body data
+- [ ] Improving the documentation
