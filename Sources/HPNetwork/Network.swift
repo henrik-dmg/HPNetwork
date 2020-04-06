@@ -22,7 +22,7 @@ public class Network {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
 
-        #if canImport(UIKit)
+        #if os(iOS) || os(tvOS)
         let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
         #endif
 
@@ -61,7 +61,7 @@ public class Network {
                 DispatchQueue.main.async {
                     completion(result)
 
-                    #if canImport(UIKit)
+                    #if os(iOS) || os(tvOS)
                     UIApplication.shared.endBackgroundTask(backgroundTaskID)
                     #endif
                 }
