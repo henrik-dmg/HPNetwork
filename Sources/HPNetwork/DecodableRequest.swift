@@ -5,8 +5,8 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public typealias Input = Data
     public typealias Output = T
 
-    open var urlString: String {
-        _urlString
+    open var url: URL? {
+        URL(string: _urlString)
     }
 
     public let requestMethod: NetworkRequestMethod

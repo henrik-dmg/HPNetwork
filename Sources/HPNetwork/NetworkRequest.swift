@@ -13,7 +13,7 @@ public protocol NetworkRequest {
      */
     func urlRequest() -> URLRequest?
 
-    var urlString: String { get }
+    var url: URL? { get }
     var requestMethod: NetworkRequestMethod { get }
     var authentication: NetworkRequestAuthentication? { get }
 
@@ -27,7 +27,7 @@ public protocol NetworkRequest {
 public extension NetworkRequest {
 
     func urlRequest() -> URLRequest? {
-        guard let url = URL(string: urlString) else {
+        guard let url = url else {
             return nil
         }
 
