@@ -21,7 +21,11 @@ public struct URLQueryItemsBuilder {
         self.queryItems = queryItems
     }
 
-    public func addingPathComponent(_ component: String) -> URLQueryItemsBuilder {
+    public func addingPathComponent(_ component: String?) -> URLQueryItemsBuilder {
+        guard let component = component else {
+            return self
+        }
+
         let encodedString = component.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? component
         return URLQueryItemsBuilder(
             scheme: scheme,
@@ -30,7 +34,7 @@ public struct URLQueryItemsBuilder {
             queryItems: queryItems)
     }
 
-    public func addingQueryItem(_ item: String, name: String) -> URLQueryItemsBuilder {
+    public func addingQueryItem(_ item: String?, name: String) -> URLQueryItemsBuilder {
         URLQueryItemsBuilder(
             scheme: scheme,
             host: host,
@@ -48,8 +52,8 @@ public struct URLQueryItemsBuilder {
             queryItems: queryItems + [URLQueryItem(name: name, value: formattedString)])
     }
 
-    public func addingQueryItem(_ items: [String], name: String) -> URLQueryItemsBuilder {
-        let itemsString = items.joined(separator: ",")
+    public func addingQueryItem(_ items: [String?], name: String) -> URLQueryItemsBuilder {
+        let itemsString = items.compactMap { $0 }.joined(separator: ",")
 
         return URLQueryItemsBuilder(
             scheme: scheme,

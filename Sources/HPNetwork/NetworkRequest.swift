@@ -5,7 +5,6 @@ import Foundation
  */
 public protocol NetworkRequest {
 
-    associatedtype Input
     associatedtype Output
 
     /**
@@ -17,8 +16,19 @@ public protocol NetworkRequest {
     var requestMethod: NetworkRequestMethod { get }
     var authentication: NetworkRequestAuthentication? { get }
 
-    func convertInput(response: NetworkResponse) throws -> Input
-    func convertResponse(input: Input, response: NetworkResponse) throws -> Output
+    func convertResponse(response: NetworkResponse) throws -> Output
+
+}
+
+public protocol DownloadRequest {
+
+    /**
+     Generates a URLRequest from the request. This will be run on a background thread so model parsing is allowed.
+     */
+    func urlRequest() -> URLRequest?
+
+    var url: URL? { get }
+    var authentication: NetworkRequestAuthentication? { get }
 
 }
 
@@ -39,29 +49,37 @@ public extension NetworkRequest {
 
 }
 
-extension NetworkRequest where Input == Data {
-
-    public func convertInput(response: NetworkResponse) throws -> Data {
-        response.data
-    }
-
-}
-
 extension NetworkRequest where Output == Data {
 
-    public func convertResponse(input: Data, response: NetworkResponse) throws -> Output {
-        input
+    public func convertResponse(response: NetworkResponse) throws -> Output {
+        response.data
     }
 
 }
 
 extension NetworkRequest where Output: Decodable {
 
-    public func convertResponse(input: Data, response: NetworkResponse) throws -> Output {
-        try JSONDecoder().decode(Output.self, from: input)
+    public func convertResponse(response: NetworkResponse) throws -> Output {
+        try JSONDecoder().decode(Output.self, from: response.data)
     }
 
 }
+
+#if canImport(UIKit)
+import UIKit
+
+extension NetworkRequest where Output == UIImage {
+
+    public func convertResponse(response: NetworkResponse) throws -> UIImage {
+        guard let image = UIImage(data: response.data) else {
+            throw NSError(description: "Could not convert data to image")
+        }
+        return image
+    }
+    
+}
+
+#endif
 
 public enum NetworkRequestMethod: String {
 
