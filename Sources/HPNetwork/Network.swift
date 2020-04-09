@@ -140,11 +140,17 @@ public class Network {
             return nil
         }
 
-        let statusCode = response.statusCode
-        if statusCode >= 200 && statusCode <= 299 {
+        switch response.statusCode {
+        case 200...299:
             return nil
-        } else {
-            return NSError(code: statusCode, description: "Networking returned with HTTP code \(statusCode)")
+        case 404:
+            return NSError(code: 404, description: "URL not found")
+        case 429:
+            return NSError(code: 429, description: "Too many requests")
+        case 401:
+            return NSError(code: 401, description: "Unauthorized request")
+        default:
+            return NSError(code: response.statusCode, description: "Networking returned with HTTP code \(response.statusCode)")
         }
     }
 
