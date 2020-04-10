@@ -11,11 +11,7 @@ extension NSError {
     }
 
     func injectJSON(_ data: Data) -> NSError {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted) else {
-            return self
-        }
-
-        let jsonString = String(data: jsonData, encoding: .utf8)
+        let jsonString = String(data: data, encoding: .utf8)
 
         var dict = userInfo
         dict[NSError.hpCodableDataKey] = jsonString
