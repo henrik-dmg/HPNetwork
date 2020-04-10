@@ -60,7 +60,11 @@ extension NetworkRequest where Output == Data {
 extension NetworkRequest where Output: Decodable {
 
     public func convertResponse(response: NetworkResponse) throws -> Output {
-        try JSONDecoder().decode(Output.self, from: response.data)
+        do {
+            return try JSONDecoder().decode(Output.self, from: response.data)
+        } catch let error as NSError {
+            throw error.injectJSON(response.data)
+        }
     }
 
 }

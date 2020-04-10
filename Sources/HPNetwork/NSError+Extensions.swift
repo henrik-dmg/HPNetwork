@@ -2,9 +2,23 @@ import Foundation
 
 extension NSError {
 
+    public static let hpCodableDataKey = "hpCodableDataKey"
+
     func withDescription(_ message: String) -> NSError {
         var dict = userInfo
         dict[NSLocalizedDescriptionKey] = message
+        return NSError(domain: domain, code: code, userInfo: dict)
+    }
+
+    func injectJSON(_ data: Data) -> NSError {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: data, options: .prettyPrinted) else {
+            return self
+        }
+
+        let jsonString = String(data: jsonData, encoding: .utf8)
+
+        var dict = userInfo
+        dict[NSError.hpCodableDataKey] = jsonString
         return NSError(domain: domain, code: code, userInfo: dict)
     }
 
