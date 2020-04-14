@@ -42,8 +42,8 @@ public struct URLQueryItemsBuilder {
             queryItems: queryItems + [URLQueryItem(name: name, value: item)])
     }
 
-    public func addingQueryItem<F: FloatingPoint>(_ item: F, name: String, digits: Int) -> URLQueryItemsBuilder {
-        let formattedString = String(format: "%.\(digits)f", String(describing: item))
+    public func addingQueryItem(_ item: Double, name: String, digits: Int) -> URLQueryItemsBuilder {
+        let formattedString = String(format: "%.\(digits)f", item)
 
         return URLQueryItemsBuilder(
             scheme: scheme,
