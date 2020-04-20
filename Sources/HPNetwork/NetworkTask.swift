@@ -37,6 +37,11 @@ public class DownloadTask: NetworkTask, URLSessionDelegate {
 
     public weak var delegate: DownloadTaskDelegate?
 
+    public init(task: URLSessionTask? = nil, cancelled: Bool = false, delegate: DownloadTaskDelegate? = nil) {
+        self.delegate = delegate
+        super.init(task: task, cancelled: cancelled)
+    }
+
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
          // Gives you the URLSessionDownloadTask that is being executed
          // along with the total file length - totalBytesExpectedToWrite
