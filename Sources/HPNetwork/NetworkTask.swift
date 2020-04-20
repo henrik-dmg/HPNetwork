@@ -1,6 +1,6 @@
 import Foundation
 
-public class NetworkTask {
+public class NetworkTask: NSObject {
 
     private var task: URLSessionTask?
     private var cancelled = false
@@ -31,4 +31,24 @@ public class NetworkTask {
         }
     }
 
+}
+
+public class DownloadTask: NetworkTask, URLSessionDelegate {
+
+    public weak var delegate: DownloadTaskDelegate?
+
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+         // Gives you the URLSessionDownloadTask that is being executed
+         // along with the total file length - totalBytesExpectedToWrite
+         // and the current amount of data that has received up to this point - totalBytesWritten
+        print(totalBytesWritten, totalBytesExpectedToWrite)
+
+        let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+        delegate?.downloadProgressUpdate(session, downloadTask: downloadTask, progress: progress)
+    }
+
+}
+
+public protocol DownloadTaskDelegate: class {
+    func downloadProgressUpdate(_ session: URLSession, downloadTask: URLSessionDownloadTask, progress: Double)
 }

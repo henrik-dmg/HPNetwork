@@ -20,15 +20,29 @@ public protocol NetworkRequest {
 
 }
 
-public protocol DownloadRequest {
+public class DownloadRequest {
+
+    var url: URL?
+    var authentication: NetworkRequestAuthentication?
+
+    internal init(url: URL? = nil, authentication: NetworkRequestAuthentication? = nil) {
+        self.url = url
+        self.authentication = authentication
+    }
+
 
     /**
      Generates a URLRequest from the request. This will be run on a background thread so model parsing is allowed.
      */
-    func urlRequest() -> URLRequest?
+    func urlRequest() -> URLRequest? {
+        guard let url = url else {
+            return nil
+        }
 
-    var url: URL? { get }
-    var authentication: NetworkRequestAuthentication? { get }
+        var request = URLRequest(url: url)
+        request.setValue(authentication?.headerString, forHTTPHeaderField: "Authorization")
+        return request
+    }
 
 }
 

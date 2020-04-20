@@ -3,16 +3,11 @@ import Foundation
 import UIKit
 #endif
 
-public class Network {
+public class Network: NSObject {
 
     public static let shared = Network()
     private let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
 
-    private let session: URLSession
-
-    public init(session: URLSession = .shared) {
-        self.session = session
-    }
 
     @discardableResult
     public func dataTask<T: NetworkRequest>(
@@ -27,11 +22,8 @@ public class Network {
         #endif
 
         // Go to a background queue as request.urlRequest() may do json parsing
-        queue.async { [weak self] in
-            guard let session = self?.session else {
-                completion(.failure(NSError(description: "No session found")))
-                return
-            }
+        queue.async {
+            let session = URLSession.shared
 
             guard let urlRequest = request.urlRequest() else {
                 completion(.failure(NSError(description: "Failed to create URLRequest")))
@@ -80,21 +72,18 @@ public class Network {
     @discardableResult
     public func downloadTask<R: DownloadRequest>(
         _ request: R,
-        completion: @escaping (Result<URL, Error>) -> Void) -> NetworkTask
+        completion: @escaping (Result<URL, Error>) -> Void) -> DownloadTask
     {
         // Create a network task to immediately return
-        let networkTask = NetworkTask()
+        let downloadTask = DownloadTask()
 
         #if os(iOS) || os(tvOS)
         let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
         #endif
 
         // Go to a background queue as request.urlRequest() may do json parsing
-        queue.async { [weak self] in
-            guard let session = self?.session else {
-                completion(.failure(NSError(description: "No session found")))
-                return
-            }
+        queue.async {
+            let session = URLSession(configuration: .default, delegate: downloadTask, delegateQueue: .main)
 
             guard let urlRequest = request.urlRequest() else {
                 completion(.failure(NSError(description: "Failed to create URLRequest")))
@@ -127,10 +116,10 @@ public class Network {
 
             // Asyncronously set the real task inside the network task.
             // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
-            networkTask.set(task)
+            downloadTask.set(task)
         }
 
-        return networkTask
+        return downloadTask
     }
 
     // MARK: - Helpers
