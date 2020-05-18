@@ -70,12 +70,12 @@ public class Network: NSObject {
 
     // This really needs a refactor dude
     @discardableResult
-    public func downloadTask<R: DownloadRequest>(
+    public func downloadTask<R: NetworkRequest>(
         _ request: R,
-        completion: @escaping (Result<URL, Error>) -> Void) -> DownloadTask
+        completion: @escaping (Result<URL, Error>) -> Void) -> NetworkTask
     {
         // Create a network task to immediately return
-        let downloadTask = DownloadTask()
+        let downloadTask = NetworkTask()
 
         #if os(iOS) || os(tvOS)
         let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
@@ -83,7 +83,7 @@ public class Network: NSObject {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            let session = URLSession(configuration: .default, delegate: downloadTask, delegateQueue: .main)
+            let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
 
             guard let urlRequest = request.urlRequest() else {
                 completion(.failure(NSError(description: "Failed to create URLRequest")))
