@@ -35,6 +35,44 @@ public extension NetworkRequest {
         return request
     }
 
+    internal func finish(data: Data?, response: URLResponse?, error: Error?, completion: @escaping (Result<Output, Error>) -> Void) {
+        let backgroundWrapper = BackgroundTaskWrapper()
+        let result = taskResult(data: data, response: response, error: error)
+
+        DispatchQueue.main.async {
+            completion(result)
+
+            #if os(iOS) || os(tvOS)
+            guard let id = backgroundWrapper.backgroundTaskID else {
+                return
+            }
+            UIApplication.shared.endBackgroundTask(id)
+            #endif
+        }
+    }
+
+    internal func taskResult(data: Data?, response: URLResponse?, error: Error?) -> Result<Output, Error> {
+        let result: Result<Output, Error>
+
+        if let error = error {
+            result = .failure(error)
+        } else if let error = Network.error(from: response) {
+            result = .failure(error)
+        } else if let data = data, let httpResponse = response as? HTTPURLResponse {
+            do {
+                let response = NetworkResponse(data: data, httpResponse: httpResponse)
+                let output = try convertResponse(response: response)
+                result = .success(output)
+            } catch let error {
+                result = .failure(error)
+            }
+        } else {
+            result = .failure(NSError.unknown)
+        }
+
+        return result
+    }
+
 }
 
 extension NetworkRequest where Output == Data {

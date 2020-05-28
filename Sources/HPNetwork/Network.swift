@@ -17,45 +17,10 @@ public class Network: NSObject {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
 
-        #if os(iOS) || os(tvOS)
-        let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
-        #endif
-
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            let session = URLSession.shared
-
-            guard let urlRequest = request.urlRequest() else {
-                completion(.failure(NSError(description: "Failed to create URLRequest")))
+            guard let task = request.makeDataTask(completion: completion) else {
                 return
-            }
-
-            let task = session.dataTask(with: urlRequest) { data, response, error in
-                let result: Result<T.Output, Error>
-
-                if let error = error {
-                    result = .failure(error)
-                } else if let error = Network.error(from: response) {
-                    result = .failure(error)
-                } else if let data = data, let httpResponse = response as? HTTPURLResponse {
-                    do {
-                        let response = NetworkResponse(data: data, httpResponse: httpResponse)
-                        let output = try request.convertResponse(response: response)
-                        result = .success(output)
-                    } catch let error {
-                        result = .failure(error)
-                    }
-                } else {
-                    result = .failure(NSError.unknown)
-                }
-
-                DispatchQueue.main.async {
-                    completion(result)
-
-                    #if os(iOS) || os(tvOS)
-                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                    #endif
-                }
             }
 
             task.resume()
@@ -71,62 +36,53 @@ public class Network: NSObject {
     // This really needs a refactor dude
     @discardableResult
     public func uploadTask<T: NetworkRequest>(
-    _ request: T,
-    data: Data?,
-    completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
+        _ request: T,
+        data: Data?,
+        completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
     {
         // Create a network task to immediately return
-        let uploadTask = NetworkTask()
-
-        #if os(iOS) || os(tvOS)
-        let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
-        #endif
+        let networkTask = NetworkTask()
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
-
-            guard let urlRequest = request.urlRequest() else {
-                completion(.failure(NSError(description: "Failed to create URLRequest")))
+            guard let task = request.makeUploadTask(data: data, completion: completion) else {
                 return
-            }
-
-            let task = session.uploadTask(with: urlRequest, from: data) { data, response, error in
-                let result: Result<T.Output, Error>
-
-                if let error = error {
-                    result = .failure(error)
-                } else if let error = Network.error(from: response) {
-                    result = .failure(error)
-                } else if let data = data, let httpResponse = response as? HTTPURLResponse {
-                    do {
-                        let response = NetworkResponse(data: data, httpResponse: httpResponse)
-                        let output = try request.convertResponse(response: response)
-                        result = .success(output)
-                    } catch let error {
-                        result = .failure(error)
-                    }
-                } else {
-                    result = .failure(NSError.unknown)
-                }
-
-                DispatchQueue.main.async {
-                    completion(result)
-
-                    #if os(iOS) || os(tvOS)
-                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                    #endif
-                }
             }
 
             task.resume()
 
             // Asyncronously set the real task inside the network task.
             // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
-            uploadTask.set(task)
+            networkTask.set(task)
         }
 
-        return uploadTask
+        return networkTask
+    }
+
+    // This really needs a refactor dude
+    @discardableResult
+    public func uploadTask<T: NetworkRequest>(
+        _ request: T,
+        fileURL: URL,
+        completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
+    {
+        // Create a network task to immediately return
+        let networkTask = NetworkTask()
+
+        // Go to a background queue as request.urlRequest() may do json parsing
+        queue.async {
+            guard let task = request.makeUploadTask(fileURL: fileURL, completion: completion) else {
+                return
+            }
+
+            task.resume()
+
+            // Asyncronously set the real task inside the network task.
+            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
+            networkTask.set(task)
+        }
+
+        return networkTask
     }
 
     // This really needs a refactor dude
@@ -185,7 +141,7 @@ public class Network: NSObject {
 
     // MARK: - Helpers
 
-    private static func error(from response: URLResponse?) -> Error? {
+    static func error(from response: URLResponse?) -> Error? {
         guard let response = response as? HTTPURLResponse else {
             return nil
         }
@@ -206,7 +162,7 @@ public class Network: NSObject {
 
     // MARK: - File Handling
 
-    private static func moveFile(from origin: URL, to destination: URL) throws {
+    static func moveFile(from origin: URL, to destination: URL) throws {
         if FileManager.default.fileExists(atPath: destination.path) {
             try FileManager.default.removeItem(at: destination)
         }
