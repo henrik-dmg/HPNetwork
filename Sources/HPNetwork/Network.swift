@@ -70,6 +70,67 @@ public class Network: NSObject {
 
     // This really needs a refactor dude
     @discardableResult
+    public func uploadTask<T: NetworkRequest>(
+    _ request: T,
+    data: Data?,
+    completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
+    {
+        // Create a network task to immediately return
+        let uploadTask = NetworkTask()
+
+        #if os(iOS) || os(tvOS)
+        let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
+        #endif
+
+        // Go to a background queue as request.urlRequest() may do json parsing
+        queue.async {
+            let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
+
+            guard let urlRequest = request.urlRequest() else {
+                completion(.failure(NSError(description: "Failed to create URLRequest")))
+                return
+            }
+
+            let task = session.uploadTask(with: urlRequest, from: data) { data, response, error in
+                let result: Result<T.Output, Error>
+
+                if let error = error {
+                    result = .failure(error)
+                } else if let error = Network.error(from: response) {
+                    result = .failure(error)
+                } else if let data = data, let httpResponse = response as? HTTPURLResponse {
+                    do {
+                        let response = NetworkResponse(data: data, httpResponse: httpResponse)
+                        let output = try request.convertResponse(response: response)
+                        result = .success(output)
+                    } catch let error {
+                        result = .failure(error)
+                    }
+                } else {
+                    result = .failure(NSError.unknown)
+                }
+
+                DispatchQueue.main.async {
+                    completion(result)
+
+                    #if os(iOS) || os(tvOS)
+                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
+                    #endif
+                }
+            }
+
+            task.resume()
+
+            // Asyncronously set the real task inside the network task.
+            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
+            uploadTask.set(task)
+        }
+
+        return uploadTask
+    }
+
+    // This really needs a refactor dude
+    @discardableResult
     public func downloadTask<R: NetworkRequest>(
         _ request: R,
         completion: @escaping (Result<URL, Error>) -> Void) -> NetworkTask

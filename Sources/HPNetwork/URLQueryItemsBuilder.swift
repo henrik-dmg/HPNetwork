@@ -7,9 +7,9 @@ public struct URLQueryItemsBuilder {
     private let path: String
     private let queryItems: [URLQueryItem]
 
-    public init(scheme: String = "https", _ hostString: String) {
+    public init(scheme: String = "https", host: String) {
         self.scheme = scheme
-        self.host = hostString
+        self.host = host
         self.path = String()
         self.queryItems = []
     }
@@ -42,7 +42,7 @@ public struct URLQueryItemsBuilder {
             queryItems: queryItems + [URLQueryItem(name: name, value: item)])
     }
 
-    public func addingQueryItem(_ item: Double, name: String, digits: Int) -> URLQueryItemsBuilder {
+    public func addingQueryItem(_ item: Double, digits: Int, name: String) -> URLQueryItemsBuilder {
         let formattedString = String(format: "%.\(digits)f", item)
 
         return URLQueryItemsBuilder(

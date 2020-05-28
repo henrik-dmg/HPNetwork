@@ -4,12 +4,12 @@ import XCTest
 class URLQueryItemBuilderTests: XCTestCase {
 
     func testURL() {
-        let url = URLQueryItemsBuilder("api.openweathermap.org")
+        let url = URLQueryItemsBuilder(host: "api.openweathermap.org")
             .addingPathComponent("data")
             .addingPathComponent("2.5")
             .addingPathComponent("onecall")
-            .addingQueryItem(48.123123012, name: "lat", digits: 5)
-            .addingQueryItem(-12.9123001299, name: "lon", digits: 5)
+            .addingQueryItem(48.123123012, digits: 5, name: "lat")
+            .addingQueryItem(-12.9123001299, digits: 5, name: "lon")
             .addingQueryItem("apiKey", name: "appid")
             .addingQueryItem("metric", name: "units")
             .build()
