@@ -16,10 +16,11 @@ public class Network: NSObject {
     {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
+        let backgroundWrapper = BackgroundTaskWrapper()
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeDataTask(completion: completion) else {
+            guard let task = request.makeDataTask(backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 
@@ -42,10 +43,11 @@ public class Network: NSObject {
     {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
+        let backgroundWrapper = BackgroundTaskWrapper()
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(data: data, completion: completion) else {
+            guard let task = request.makeUploadTask(data: data, backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 
@@ -68,10 +70,11 @@ public class Network: NSObject {
     {
         // Create a network task to immediately return
         let networkTask = NetworkTask()
+        let backgroundWrapper = BackgroundTaskWrapper()
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(fileURL: fileURL, completion: completion) else {
+            guard let task = request.makeUploadTask(fileURL: fileURL, backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 

@@ -18,5 +18,4 @@ class NetworkTests: XCTestCase {
 }
 
 struct EmptyStruct: Codable {
-
 }

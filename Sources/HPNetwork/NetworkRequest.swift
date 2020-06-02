@@ -35,15 +35,14 @@ public extension NetworkRequest {
         return request
     }
 
-    internal func finish(data: Data?, response: URLResponse?, error: Error?, completion: @escaping (Result<Output, Error>) -> Void) {
-        let backgroundWrapper = BackgroundTaskWrapper()
+    internal func finish(data: Data?, response: URLResponse?, error: Error?, backgroundTask: BackgroundTaskWrapper, completion: @escaping (Result<Output, Error>) -> Void) {
         let result = taskResult(data: data, response: response, error: error)
 
         DispatchQueue.main.async {
             completion(result)
 
             #if os(iOS) || os(tvOS)
-            guard let id = backgroundWrapper.backgroundTaskID else {
+            guard let id = backgroundTask.backgroundTaskID else {
                 return
             }
             UIApplication.shared.endBackgroundTask(id)
