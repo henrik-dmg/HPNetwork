@@ -5,7 +5,7 @@ Pod::Spec.new do |spec|
   spec.summary      = "A lightweight but customisable networking stack written in Swift"
   spec.swift_version = "5.0"
 
-  spec.homepage     = "https://github.com/henrik-dmg/HPNetwork"
+  spec.homepage     = "https://panhans.dev/opensource/HPNetwork"
 
   spec.license      = "MIT"
 
@@ -17,7 +17,7 @@ Pod::Spec.new do |spec|
   spec.watchos.deployment_target = "3.0"
   spec.tvos.deployment_target = "9.0"
 
-  spec.source       = { :git => "https://github.com/henrik-dmg/HPNetwork.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/henrik-dmg/HPNetwork.git", :tag => spec.version }
 
   spec.source_files  = "Sources/HPNetwork/**/*.swift"
 
