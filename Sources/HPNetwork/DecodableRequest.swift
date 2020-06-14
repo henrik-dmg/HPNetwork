@@ -5,7 +5,7 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public typealias Input = Data
     public typealias Output = T
 
-    public let url: URL?
+    public var url: URL?
     public let finishingQueue: DispatchQueue
     public let requestMethod: NetworkRequestMethod
     public let authentication: NetworkRequestAuthentication?
