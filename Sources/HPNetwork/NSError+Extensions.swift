@@ -24,5 +24,7 @@ extension NSError {
     }
 
     static let unknown = NSError(code: 1, description: "Unknown error")
+    static let failedToCreate = NSError(code: 42, description: "Failed to create URLRequest")
+    static let imageError = NSError(code: 78, description: "Could not convert data to image")
 
 }

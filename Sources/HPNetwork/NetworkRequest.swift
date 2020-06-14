@@ -12,6 +12,7 @@ public protocol NetworkRequest {
      */
     func urlRequest() -> URLRequest?
 
+    var finishingQueue: DispatchQueue { get }
     var url: URL? { get }
     var requestMethod: NetworkRequestMethod { get }
     var authentication: NetworkRequestAuthentication? { get }
@@ -35,10 +36,17 @@ public extension NetworkRequest {
         return request
     }
 
-    internal func finish(data: Data?, response: URLResponse?, error: Error?, backgroundTask: BackgroundTaskWrapper, completion: @escaping (Result<Output, Error>) -> Void) {
+    internal func finish(
+        data: Data?,
+        response: URLResponse?,
+        error: Error?,
+        backgroundTask: BackgroundTaskWrapper,
+        finishingQueue: DispatchQueue,
+        completion: @escaping (Result<Output, Error>) -> Void)
+    {
         let result = taskResult(data: data, response: response, error: error)
 
-        DispatchQueue.main.async {
+        finishingQueue.async {
             completion(result)
 
             #if os(iOS) || os(tvOS)
@@ -101,11 +109,27 @@ extension NetworkRequest where Output == UIImage {
 
     public func convertResponse(response: NetworkResponse) throws -> UIImage {
         guard let image = UIImage(data: response.data) else {
-            throw NSError(description: "Could not convert data to image")
+            throw NSError.imageError
         }
         return image
     }
     
+}
+
+#endif
+
+#if canImport(AppKit)
+import AppKit
+
+extension NetworkRequest where Output == NSImage {
+
+    public func convertResponse(response: NetworkResponse) throws -> NSImage {
+        guard let image = NSImage(data: response.data) else {
+            throw NSError.imageError
+        }
+        return image
+    }
+
 }
 
 #endif

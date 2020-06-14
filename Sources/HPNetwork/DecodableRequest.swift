@@ -5,21 +5,35 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public typealias Input = Data
     public typealias Output = T
 
-    open var url: URL? {
-        URL(string: _urlString)
-    }
-
+    public let url: URL?
+    public let finishingQueue: DispatchQueue
     public let requestMethod: NetworkRequestMethod
     public let authentication: NetworkRequestAuthentication?
-
-    private let _urlString: String
 
     open var decoder: JSONDecoder {
         JSONDecoder()
     }
 
-    public init(urlString: String, requestMethod: NetworkRequestMethod = .get, authentication: NetworkRequestAuthentication? = nil) {
-        self._urlString = urlString
+    public init(
+        urlString: String,
+        finishingQueue: DispatchQueue = .main,
+        requestMethod: NetworkRequestMethod = .get,
+        authentication: NetworkRequestAuthentication? = nil)
+    {
+        self.url = URL(string: urlString)
+        self.finishingQueue = finishingQueue
+        self.requestMethod = requestMethod
+        self.authentication = authentication
+    }
+
+    public init(
+        url: URL,
+        finishingQueue: DispatchQueue = .main,
+        requestMethod: NetworkRequestMethod = .get,
+        authentication: NetworkRequestAuthentication? = nil)
+    {
+        self.url = url
+        self.finishingQueue = finishingQueue
         self.requestMethod = requestMethod
         self.authentication = authentication
     }

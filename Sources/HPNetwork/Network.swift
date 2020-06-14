@@ -20,7 +20,10 @@ public class Network: NSObject {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeDataTask(backgroundTask: backgroundWrapper, completion: completion) else {
+            guard let task = request.makeDataTask(
+                backgroundTask: backgroundWrapper,
+                completion: completion)
+            else {
                 return
             }
 
@@ -47,7 +50,11 @@ public class Network: NSObject {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(data: data, backgroundTask: backgroundWrapper, completion: completion) else {
+            guard let task = request.makeUploadTask(
+                data: data,
+                backgroundTask: backgroundWrapper,
+                completion: completion)
+            else {
                 return
             }
 
@@ -74,7 +81,11 @@ public class Network: NSObject {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(fileURL: fileURL, backgroundTask: backgroundWrapper, completion: completion) else {
+            guard let task = request.makeUploadTask(
+                fileURL: fileURL,
+                backgroundTask: backgroundWrapper,
+                completion: completion)
+            else {
                 return
             }
 
@@ -106,7 +117,7 @@ public class Network: NSObject {
             let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
 
             guard let urlRequest = request.urlRequest() else {
-                completion(.failure(NSError(description: "Failed to create URLRequest")))
+                completion(.failure(NSError.failedToCreate))
                 return
             }
 
@@ -123,7 +134,7 @@ public class Network: NSObject {
                     result = .failure(NSError.unknown)
                 }
 
-                DispatchQueue.main.async {
+                request.finishingQueue.async {
                     completion(result)
 
                     #if os(iOS) || os(tvOS)
