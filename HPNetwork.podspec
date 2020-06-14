@@ -1,31 +1,32 @@
-Pod::Spec.new do |spec|
+Pod::Spec.new do |s|
 
-  spec.name         = "HPNetwork"
-  spec.version      = "0.4.0"
-  spec.summary      = "A lightweight but customisable networking stack written in Swift"
-  spec.swift_version = "5.0"
+  s.name         = "HPNetwork"
+  s.version      = "0.4.0"
+  s.summary      = "A lightweight but customisable networking stack written in Swift"
+  s.swift_version = "5.0"
 
-  spec.homepage     = "https://panhans.dev/opensource/HPNetwork"
+  s.homepage     = "https://panhans.dev/opensource/HPNetwork"
 
-  spec.license      = "MIT"
+  s.license      = "MIT"
 
-  spec.author             = { "Henrik Panhans" => "henrik@panhans.dev" }
-  spec.social_media_url   = "https://twitter.com/henrik_dmg"
+  s.author             = { "Henrik Panhans" => "henrik@panhans.dev" }
+  s.social_media_url   = "https://twitter.com/henrik_dmg"
 
-  spec.ios.deployment_target = "8.0"
-  spec.osx.deployment_target = "10.11"
-  spec.watchos.deployment_target = "3.0"
-  spec.tvos.deployment_target = "9.0"
+  s.ios.deployment_target = "8.0"
+  s.osx.deployment_target = "10.11"
+  s.watchos.deployment_target = "3.0"
+  s.tvos.deployment_target = "9.0"
 
-  spec.source       = { :git => "https://github.com/henrik-dmg/HPNetwork.git", :tag => spec.version }
+  s.source       = { :git => "https://github.com/henrik-dmg/HPNetwork.git", :tag => s.version }
 
-  spec.source_files  = "Sources/HPNetwork/**/*.swift"
+  s.source_files  = "Sources/HPNetwork/**/*.swift"
 
-  spec.framework = "Foundation"
-  spec.ios.framework = "UIKit"
-  spec.watchos.framework = "UIKit"
-  spec.tvos.framework = "UIKit"
+  s.framework = "Foundation"
+  s.ios.framework = "UIKit"
+  s.watchos.framework = "UIKit"
+  s.tvos.framework = "UIKit"
+  s.osx.framework = "AppKit"
 
-  spec.requires_arc = true
+  s.requires_arc = true
 
 end
