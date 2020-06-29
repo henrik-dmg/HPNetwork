@@ -5,6 +5,7 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public typealias Input = Data
     public typealias Output = T
 
+    public let urlSession: URLSession
     public let finishingQueue: DispatchQueue
     public let requestMethod: NetworkRequestMethod
     public let authentication: NetworkRequestAuthentication?
@@ -21,11 +22,13 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
 
     public init(
         urlString: String,
+        urlSession: URLSession = .shared,
         finishingQueue: DispatchQueue = .main,
         requestMethod: NetworkRequestMethod = .get,
         authentication: NetworkRequestAuthentication? = nil)
     {
         self.urlString = urlString
+        self.urlSession = urlSession
         self.finishingQueue = finishingQueue
         self.requestMethod = requestMethod
         self.authentication = authentication
@@ -33,11 +36,13 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
 
     public init(
         url: URL,
+        urlSession: URLSession = .shared,
         finishingQueue: DispatchQueue = .main,
         requestMethod: NetworkRequestMethod = .get,
         authentication: NetworkRequestAuthentication? = nil)
     {
         self.urlString = url.absoluteString
+        self.urlSession = urlSession
         self.finishingQueue = finishingQueue
         self.requestMethod = requestMethod
         self.authentication = authentication

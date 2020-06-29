@@ -13,17 +13,20 @@ public class ImageDownloadRequest: NetworkRequest {
     #endif
 
     public let url: URL?
+    public let urlSession: URLSession
     public let finishingQueue: DispatchQueue
     public let requestMethod: NetworkRequestMethod
     public let authentication: NetworkRequestAuthentication?
 
     public init(
         url: URL?,
+        urlSession: URLSession = .shared,
         finishingQueue: DispatchQueue = .main,
         requestMethod: NetworkRequestMethod = .get,
         authentication: NetworkRequestAuthentication? = nil)
     {
         self.url = url
+        self.urlSession = urlSession
         self.finishingQueue = finishingQueue
         self.requestMethod = requestMethod
         self.authentication = authentication

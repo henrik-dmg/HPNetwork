@@ -13,7 +13,7 @@ extension NetworkRequest {
 
         let queue = finishingQueue
 
-        return URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+        return urlSession.dataTask(with: urlRequest) { data, response, error in
             self.finish(
                 data: data,
                 response: response,
@@ -36,7 +36,7 @@ extension NetworkRequest {
 
         let queue = finishingQueue
 
-        return URLSession.shared.uploadTask(with: urlRequest, from: data) { data, response, error in
+        return urlSession.uploadTask(with: urlRequest, from: data) { data, response, error in
             self.finish(
                 data: data,
                 response: response,
@@ -59,7 +59,7 @@ extension NetworkRequest {
 
         let queue = finishingQueue
 
-        return URLSession.shared.uploadTask(with: urlRequest, fromFile: fileURL) { data, response, error in
+        return urlSession.uploadTask(with: urlRequest, fromFile: fileURL) { data, response, error in
             self.finish(
                 data: data,
                 response: response,

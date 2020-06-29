@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HPNetwork"
-  s.version      = "0.4.2"
+  s.version      = "0.5.0"
   s.summary      = "A lightweight but customisable networking stack written in Swift"
   s.swift_version = "5.0"
 
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.author             = { "Henrik Panhans" => "henrik@panhans.dev" }
   s.social_media_url   = "https://twitter.com/henrik_dmg"
 
-  s.ios.deployment_target = "8.0"
+  s.ios.deployment_target = "9.0"
   s.osx.deployment_target = "10.11"
   s.watchos.deployment_target = "3.0"
   s.tvos.deployment_target = "9.0"

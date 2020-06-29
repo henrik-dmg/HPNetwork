@@ -16,6 +16,7 @@ public protocol NetworkRequest {
     var url: URL? { get }
     var requestMethod: NetworkRequestMethod { get }
     var authentication: NetworkRequestAuthentication? { get }
+    var urlSession: URLSession { get }
 
     func convertResponse(response: NetworkResponse) throws -> Output
 
