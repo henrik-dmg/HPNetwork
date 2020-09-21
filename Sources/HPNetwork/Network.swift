@@ -8,7 +8,6 @@ public class Network: NSObject {
     public static let shared = Network()
     private let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
 
-
     @discardableResult
     public func dataTask<T: NetworkRequest>(
         _ request: T,

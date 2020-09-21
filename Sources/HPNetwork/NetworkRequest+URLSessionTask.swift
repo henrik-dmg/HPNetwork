@@ -20,7 +20,8 @@ extension NetworkRequest {
                 error: error,
                 backgroundTask: backgroundTask,
                 finishingQueue: queue,
-                completion: completion)
+                completion: completion
+            )
         }
     }
 
@@ -43,7 +44,8 @@ extension NetworkRequest {
                 error: error,
                 backgroundTask: backgroundTask,
                 finishingQueue: queue,
-                completion: completion)
+                completion: completion
+            )
         }
     }
 
@@ -66,7 +68,8 @@ extension NetworkRequest {
                 error: error,
                 backgroundTask: backgroundTask,
                 finishingQueue: queue,
-                completion: completion)
+                completion: completion
+            )
         }
     }
 
