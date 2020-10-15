@@ -4,6 +4,7 @@ public enum NetworkRequestAuthentication {
 
     case basic(username: String, password: String)
     case raw(string: String)
+    case bearer(token: String)
 
     internal var headerString: String {
         switch self {
@@ -13,6 +14,8 @@ public enum NetworkRequestAuthentication {
             return "Basic \(loginDataString)"
         case .raw(let string):
             return string
+        case .bearer(let token):
+            return "Authorization: Bearer \(token)"
         }
     }
 
