@@ -162,14 +162,9 @@ public class Network: NSObject {
         switch response.statusCode {
         case 200...299:
             return nil
-        case 404:
-            return NSError(code: 404, description: "URL not found")
-        case 429:
-            return NSError(code: 429, description: "Too many requests")
-        case 401:
-            return NSError(code: 401, description: "Unauthorized request")
         default:
-            return NSError(code: response.statusCode, description: "Networking returned with HTTP code \(response.statusCode)")
+            let errorCode = URLError.Code(rawValue: response.statusCode)
+            return URLError(errorCode)
         }
     }
 

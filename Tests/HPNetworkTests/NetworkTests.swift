@@ -59,6 +59,7 @@ class NetworkTests: XCTestCase {
 
         wait(for: [expectation], timeout: 20)
     }
+    #endif
 
     func testImageDownloadOnGlobal() {
         let expectation = XCTestExpectation(description: "fetched from server")
@@ -78,9 +79,7 @@ class NetworkTests: XCTestCase {
 
         wait(for: [expectation], timeout: 20)
     }
-    #endif
 
 }
 
-struct EmptyStruct: Codable {
-}
+struct EmptyStruct: Codable {}

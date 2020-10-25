@@ -22,6 +22,18 @@ public protocol NetworkRequest {
 
 }
 
+// Some sensible defaults
+
+public extension NetworkRequest {
+
+    var finishingQueue: DispatchQueue { .main }
+
+    var authentication: NetworkRequestAuthentication? { nil }
+
+    var urlSession: URLSession { .shared }
+
+}
+
 // MARK: - Convenience Extensions
 
 public extension NetworkRequest {

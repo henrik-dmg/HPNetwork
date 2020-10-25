@@ -31,7 +31,8 @@ public struct URLQueryItemsBuilder {
             scheme: scheme,
             host: host,
             path: path + "/\(encodedString)",
-            queryItems: queryItems)
+            queryItems: queryItems
+        )
     }
 
     public func addingQueryItem(_ item: String?, name: String) -> URLQueryItemsBuilder {
@@ -39,27 +40,51 @@ public struct URLQueryItemsBuilder {
             scheme: scheme,
             host: host,
             path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: item)])
+            queryItems: queryItems + [URLQueryItem(name: name, value: item)]
+        )
     }
 
-    public func addingQueryItem(_ item: Double, digits: Int, name: String) -> URLQueryItemsBuilder {
+    public func addingQueryItem(_ item: Double?, digits: Int, name: String) -> URLQueryItemsBuilder {
+        guard let item = item else {
+            return self
+        }
+
         let formattedString = String(format: "%.\(digits)f", item)
 
         return URLQueryItemsBuilder(
             scheme: scheme,
             host: host,
             path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: formattedString)])
+            queryItems: queryItems + [URLQueryItem(name: name, value: formattedString)]
+        )
+    }
+
+    public func addingQueryItem(_ item: Int?, name: String) -> URLQueryItemsBuilder {
+        guard let item = item else {
+            return self
+        }
+
+        return URLQueryItemsBuilder(
+            scheme: scheme,
+            host: host,
+            path: path,
+            queryItems: queryItems + [URLQueryItem(name: name, value: "\(item)")]
+        )
     }
 
     public func addingQueryItem(_ items: [String?], name: String) -> URLQueryItemsBuilder {
+        guard !items.isEmpty else {
+            return self
+        }
+    
         let itemsString = items.compactMap { $0 }.joined(separator: ",")
 
         return URLQueryItemsBuilder(
             scheme: scheme,
             host: host,
             path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: itemsString)])
+            queryItems: queryItems + [URLQueryItem(name: name, value: itemsString)]
+        )
     }
 
     public func build() -> URL? {
