@@ -17,6 +17,7 @@ let package = Package(
         .target(name: "HPNetwork"),
         .testTarget(
             name: "HPNetworkTests",
-            dependencies: ["HPNetwork"])
+            dependencies: ["HPNetwork"]
+		)
     ]
 )

@@ -48,7 +48,7 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
         self.authentication = authentication
     }
 
-    public func convertResponse(response: NetworkResponse) throws -> Output {
+    open func convertResponse(response: NetworkResponse) throws -> Output {
         do {
             return try decoder.decode(T.self, from: response.data)
         } catch let error as NSError {
