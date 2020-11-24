@@ -14,6 +14,8 @@ public protocol NetworkRequest {
 
     var finishingQueue: DispatchQueue { get }
     var url: URL? { get }
+	var headerFields: [NetworkRequestHeaderField]? { get }
+	var httpBody: Data? { get }
     var requestMethod: NetworkRequestMethod { get }
     var authentication: NetworkRequestAuthentication? { get }
     var urlSession: URLSession { get }
@@ -25,6 +27,10 @@ public protocol NetworkRequest {
 // Some sensible defaults
 
 public extension NetworkRequest {
+
+	var headerFields: [NetworkRequestHeaderField]? { nil }
+
+	var httpBody: Data? { nil }
 
     var finishingQueue: DispatchQueue { .main }
 
@@ -45,7 +51,13 @@ public extension NetworkRequest {
 
         var request = URLRequest(url: url)
         request.httpMethod = requestMethod.rawValue
-        request.setValue(authentication?.headerString, forHTTPHeaderField: "Authorization")
+		request.httpBody = httpBody
+		if let auth = authentication {
+			request.addHeaderField(auth.headerField)
+		}
+        headerFields?.forEach {
+			request.addHeaderField($0)
+		}
         return request
     }
 

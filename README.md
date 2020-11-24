@@ -36,6 +36,7 @@ class IPLocationRequest: NetworkRequest {
     let urlString: String = "https://ipapi.co/json"
     let requestMethod: NetworkRequestMethod = .get
     let authentication: NetworkRequestAuthentication? = nil
+    let headerFields: [NetworkRequestHeaderField]? = nil
 
 }
 ```

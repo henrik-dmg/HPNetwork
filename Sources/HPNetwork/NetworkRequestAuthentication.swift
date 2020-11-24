@@ -19,4 +19,8 @@ public enum NetworkRequestAuthentication {
         }
     }
 
+	internal var headerField: NetworkRequestHeaderField {
+		NetworkRequestHeaderField(name: "Authentication", value: headerString)
+	}
+
 }
