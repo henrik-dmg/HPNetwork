@@ -170,7 +170,7 @@ public class Network: NSObject {
 
     // MARK: - File Handling
 
-    static func moveFile(from origin: URL, to destination: URL) throws {
+    private static func moveFile(from origin: URL, to destination: URL) throws {
         if FileManager.default.fileExists(atPath: destination.path) {
             try FileManager.default.removeItem(at: destination)
         }

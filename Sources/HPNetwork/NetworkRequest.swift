@@ -86,18 +86,18 @@ public extension NetworkRequest {
     internal func taskResult(data: Data?, response: URLResponse?, error: Error?) -> Result<Output, Error> {
         let result: Result<Output, Error>
 
-        if let error = error {
+		if let error = error {
+			result = .failure(error)
+		} else if let data = data, let httpResponse = response as? HTTPURLResponse {
+			do {
+				let response = NetworkResponse(data: data, httpResponse: httpResponse)
+				let output = try convertResponse(response: response)
+				result = .success(output)
+			} catch let error {
+				result = .failure(error)
+			}
+		} else if let error = Network.error(from: response) {
             result = .failure(error)
-        } else if let error = Network.error(from: response) {
-            result = .failure(error)
-        } else if let data = data, let httpResponse = response as? HTTPURLResponse {
-            do {
-                let response = NetworkResponse(data: data, httpResponse: httpResponse)
-                let output = try convertResponse(response: response)
-                result = .success(output)
-            } catch let error {
-                result = .failure(error)
-            }
         } else {
             result = .failure(NSError.unknown)
         }

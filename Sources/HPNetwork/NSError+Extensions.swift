@@ -11,7 +11,7 @@ extension NSError {
     }
 
     func injectJSON(_ data: Data) -> NSError {
-        let jsonString = String(data: data, encoding: .utf8)
+		let jsonString = data.prettyPrintedJSONString
 
         var dict = userInfo
         dict[NSError.hpCodableDataKey] = jsonString
@@ -26,5 +26,17 @@ extension NSError {
     static let unknown = NSError(code: 1, description: "Unknown error")
     static let failedToCreate = NSError(code: 42, description: "Failed to create URLRequest")
     static let imageError = NSError(code: 78, description: "Could not convert data to image")
+
+}
+
+extension Data {
+
+	var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
+		guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
+			  let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
+			  let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
+
+		return prettyPrintedString
+	}
 
 }
