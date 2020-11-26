@@ -27,6 +27,7 @@ public struct URLQueryItemsBuilder {
         }
 
         let encodedString = component.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? component
+
         return URLQueryItemsBuilder(
             scheme: scheme,
             host: host,
@@ -36,7 +37,11 @@ public struct URLQueryItemsBuilder {
     }
 
     public func addingQueryItem(_ item: String?, name: String) -> URLQueryItemsBuilder {
-        URLQueryItemsBuilder(
+		guard let item = item else {
+			return self
+		}
+
+        return URLQueryItemsBuilder(
             scheme: scheme,
             host: host,
             path: path,

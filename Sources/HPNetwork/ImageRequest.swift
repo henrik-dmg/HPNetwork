@@ -33,3 +33,31 @@ public class ImageDownloadRequest: NetworkRequest {
     }
 
 }
+
+#if canImport(UIKit)
+
+extension NetworkRequest where Output == UIImage {
+
+	public func convertResponse(response: NetworkResponse) throws -> UIImage {
+		guard let image = UIImage(data: response.data) else {
+			throw NSError.imageError
+		}
+		return image
+	}
+
+}
+
+#elseif canImport(AppKit)
+
+extension NetworkRequest where Output == NSImage {
+
+	public func convertResponse(response: NetworkResponse) throws -> NSImage {
+		guard let image = NSImage(data: response.data) else {
+			throw NSError.imageError
+		}
+		return image
+	}
+
+}
+
+#endif

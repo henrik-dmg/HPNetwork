@@ -7,13 +7,18 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
 
     public let urlSession: URLSession
     public let finishingQueue: DispatchQueue
-    public let requestMethod: NetworkRequestMethod
-    public let authentication: NetworkRequestAuthentication?
+	private let _url: URL?
 
-    private let urlString: String
+	open var requestMethod: NetworkRequestMethod {
+		.get
+	}
+
+	open var authentication: NetworkRequestAuthentication? {
+		nil
+	}
 
     open var url: URL? {
-        URL(string: urlString)
+		_url
     }
 
     open var decoder: JSONDecoder {
@@ -23,29 +28,21 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public init(
         urlString: String,
         urlSession: URLSession = .shared,
-        finishingQueue: DispatchQueue = .main,
-        requestMethod: NetworkRequestMethod = .get,
-        authentication: NetworkRequestAuthentication? = nil)
+        finishingQueue: DispatchQueue = .main)
     {
-        self.urlString = urlString
+        self._url = URL(string: urlString)
         self.urlSession = urlSession
         self.finishingQueue = finishingQueue
-        self.requestMethod = requestMethod
-        self.authentication = authentication
     }
 
     public init(
         url: URL,
         urlSession: URLSession = .shared,
-        finishingQueue: DispatchQueue = .main,
-        requestMethod: NetworkRequestMethod = .get,
-        authentication: NetworkRequestAuthentication? = nil)
+        finishingQueue: DispatchQueue = .main)
     {
-        self.urlString = url.absoluteString
+        self._url = url
         self.urlSession = urlSession
         self.finishingQueue = finishingQueue
-        self.requestMethod = requestMethod
-        self.authentication = authentication
     }
 
     open func convertResponse(response: NetworkResponse) throws -> Output {

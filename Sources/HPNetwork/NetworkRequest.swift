@@ -21,6 +21,7 @@ public protocol NetworkRequest {
     var urlSession: URLSession { get }
 
     func convertResponse(response: NetworkResponse) throws -> Output
+	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error
 
 }
 
@@ -38,9 +39,17 @@ public extension NetworkRequest {
 
     var urlSession: URLSession { .shared }
 
+	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
+		error
+	}
+
 }
 
-// MARK: - Convenience Extensions
+// MARK: - Convenience
+
+#if os(iOS)
+import UIKit
+#endif
 
 public extension NetworkRequest {
 
@@ -74,7 +83,7 @@ public extension NetworkRequest {
         finishingQueue.async {
             completion(result)
 
-            #if os(iOS) || os(tvOS)
+            #if os(iOS)
             guard let id = backgroundTask.backgroundTaskID else {
                 return
             }
@@ -88,7 +97,10 @@ public extension NetworkRequest {
 
 		if let error = error {
 			result = .failure(error)
-		} else if let data = data, let httpResponse = response as? HTTPURLResponse {
+		} else if let error = Network.error(from: response) {
+			let convertedError = convertError(error, data: data, response: response)
+            result = .failure(convertedError)
+        } else if let data = data, let httpResponse = response as? HTTPURLResponse {
 			do {
 				let response = NetworkResponse(data: data, httpResponse: httpResponse)
 				let output = try convertResponse(response: response)
@@ -96,9 +108,7 @@ public extension NetworkRequest {
 			} catch let error {
 				result = .failure(error)
 			}
-		} else if let error = Network.error(from: response) {
-            result = .failure(error)
-        } else {
+		} else {
             result = .failure(NSError.unknown)
         }
 
@@ -124,51 +134,5 @@ extension NetworkRequest where Output: Decodable {
             throw error.injectJSON(response.data)
         }
     }
-
-}
-
-#if canImport(UIKit)
-import UIKit
-
-extension NetworkRequest where Output == UIImage {
-
-    public func convertResponse(response: NetworkResponse) throws -> UIImage {
-        guard let image = UIImage(data: response.data) else {
-            throw NSError.imageError
-        }
-        return image
-    }
-    
-}
-
-#endif
-
-#if canImport(AppKit)
-import AppKit
-
-extension NetworkRequest where Output == NSImage {
-
-    public func convertResponse(response: NetworkResponse) throws -> NSImage {
-        guard let image = NSImage(data: response.data) else {
-            throw NSError.imageError
-        }
-        return image
-    }
-
-}
-
-#endif
-
-public enum NetworkRequestMethod: String {
-
-    case get = "GET"
-    case post = "POST"
-    case head = "HEAD"
-    case put = "PUT"
-    case delete = "DELETE"
-    case connect = "CONNECT"
-    case options = "OPTIONS"
-    case trace = "TRACE"
-    case patch = "PATCH"
 
 }

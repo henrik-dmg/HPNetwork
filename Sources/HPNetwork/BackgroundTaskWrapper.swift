@@ -1,16 +1,16 @@
 import Foundation
-#if os(iOS) || os(tvOS)
+#if os(iOS)
 import UIKit
 #endif
 
 struct BackgroundTaskWrapper {
 
-    #if os(iOS) || os(tvOS)
+    #if os(iOS)
     let backgroundTaskID: UIBackgroundTaskIdentifier?
     #endif
 
     init() {
-        #if os(iOS) || os(tvOS)
+        #if os(iOS)
         backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
         #endif
     }
