@@ -15,7 +15,7 @@ public enum NetworkRequestAuthentication {
         case .raw(let string):
             return string
         case .bearer(let token):
-            return "Authorization: Bearer \(token)"
+            return "Bearer \(token)"
         }
     }
 

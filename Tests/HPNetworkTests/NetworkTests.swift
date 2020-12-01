@@ -64,11 +64,12 @@ class NetworkTests: XCTestCase {
     func testImageDownloadOnGlobal() {
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        let request = DecodableRequest<EmptyStruct>(urlString: "https://ipapi.co/json", finishingQueue: .global())
+		let customQueue = DispatchQueue(label: "com.henrikpanhans.HPNetworkTests")
+		let request = DecodableRequest<EmptyStruct>(urlString: "https://ipapi.co/json", finishingQueue: customQueue)
 
         Network.shared.dataTask(request) { result in
             expectation.fulfill()
-            XCTAssertFalse(Thread.isMainThread)
+			XCTAssertEqual(OperationQueue.main.underlyingQueue, customQueue)
             switch result {
             case .success(let empty):
                 print(empty)
