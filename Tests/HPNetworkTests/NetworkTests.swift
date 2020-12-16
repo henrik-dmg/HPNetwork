@@ -1,8 +1,6 @@
 @testable import HPNetwork
 import XCTest
-#if canImport(Combine)
 import Combine
-#endif
 
 class NetworkTests: XCTestCase {
 
@@ -84,8 +82,7 @@ class NetworkTests: XCTestCase {
         wait(for: [expectation], timeout: 20)
     }
 
-	#if canImport(Combine)
-
+	@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 	func testPublisher() {
 		let expectationFinished = expectation(description: "finished")
 		let expectationReceive = expectation(description: "receiveValue")
@@ -108,6 +105,7 @@ class NetworkTests: XCTestCase {
 		}
 	}
 
+	@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 	func testPublisherFailure() {
 		let expectationFinished = expectation(description: "finished")
 
@@ -129,8 +127,6 @@ class NetworkTests: XCTestCase {
 			cancellable.cancel()
 		}
 	}
-
-	#endif
 
 }
 
