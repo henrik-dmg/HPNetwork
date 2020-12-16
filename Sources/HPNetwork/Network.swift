@@ -3,10 +3,25 @@ import Foundation
 import UIKit
 #endif
 
-public class Network: NSObject {
+public class Network {
+
+	// MARK: - Properties
 
     public static let shared = Network()
-    private let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
+	private let queue: DispatchQueue
+
+	// MARK: - Init
+
+	public init(queue: DispatchQueue) {
+		self.queue = queue
+	}
+
+	convenience init() {
+		let queue = DispatchQueue(label: "com.henrikpanhans.Network", qos: .userInitiated, attributes: .concurrent)
+		self.init(queue: queue)
+	}
+
+	// MARK: - Requests
 
     @discardableResult
     public func dataTask<T: NetworkRequest>(
@@ -27,9 +42,6 @@ public class Network: NSObject {
             }
 
             task.resume()
-
-            // Asyncronously set the real task inside the network task.
-            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
             networkTask.set(task)
         }
 
@@ -58,9 +70,6 @@ public class Network: NSObject {
             }
 
             task.resume()
-
-            // Asyncronously set the real task inside the network task.
-            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
             networkTask.set(task)
         }
 
@@ -89,9 +98,6 @@ public class Network: NSObject {
             }
 
             task.resume()
-
-            // Asyncronously set the real task inside the network task.
-            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
             networkTask.set(task)
         }
 
@@ -143,9 +149,6 @@ public class Network: NSObject {
             }
 
             task.resume()
-
-            // Asyncronously set the real task inside the network task.
-            // Note: This may happen after the NetworkTask has been cancelled but the NetworkTask object already handles this
             downloadTask.set(task)
         }
 

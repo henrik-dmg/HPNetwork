@@ -10,7 +10,7 @@ public final class ConnectionMonitor {
     public static let connectionBecameSatisfiedNotification = Notification.Name("ConnectionBecameSatisfiedNotification")
     public static let connectionBecameUnsatisfiedNotification = Notification.Name("ConnectionBecameSatisfiedNotification")
     public static let connectionRequiresConnectionNoticication = Notification.Name("ConnectionRequiresConnectionNoticication")
-    public static let keyForPathObjectInNotifications = "updatedPathKey"
+    public static let updatedPathKey = "ConnectionMonitorUpdatedPathKey"
 
     private let pathMonitor: NWPathMonitor
 
@@ -42,7 +42,7 @@ public final class ConnectionMonitor {
     // MARK: - State Changes
 
     private func emitNotification(_ path: NWPath) {
-        let userInfo = [ConnectionMonitor.keyForPathObjectInNotifications: path]
+        let userInfo = [ConnectionMonitor.updatedPathKey: path]
 
         switch path.status {
         case .satisfied:

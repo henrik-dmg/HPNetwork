@@ -23,8 +23,8 @@ public class ImageDownloadRequest: NetworkRequest {
         urlSession: URLSession = .shared,
         finishingQueue: DispatchQueue = .main,
         requestMethod: NetworkRequestMethod = .get,
-        authentication: NetworkRequestAuthentication? = nil)
-    {
+        authentication: NetworkRequestAuthentication? = nil
+	) {
         self.url = url
         self.urlSession = urlSession
         self.finishingQueue = finishingQueue

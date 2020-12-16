@@ -28,8 +28,8 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public init(
         urlString: String,
         urlSession: URLSession = .shared,
-        finishingQueue: DispatchQueue = .main)
-    {
+        finishingQueue: DispatchQueue = .main
+	) {
         self._url = URL(string: urlString)
         self.urlSession = urlSession
         self.finishingQueue = finishingQueue
@@ -38,8 +38,8 @@ open class DecodableRequest<T: Decodable>: NetworkRequest {
     public init(
         url: URL,
         urlSession: URLSession = .shared,
-        finishingQueue: DispatchQueue = .main)
-    {
+        finishingQueue: DispatchQueue = .main
+	) {
         self._url = url
         self.urlSession = urlSession
         self.finishingQueue = finishingQueue

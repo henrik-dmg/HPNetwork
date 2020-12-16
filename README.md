@@ -1,4 +1,5 @@
-# HPNetwork ![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
+# HPNetwork
+![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
 
 `HPNetwork` is a lightweight but customizable network stack.
 
