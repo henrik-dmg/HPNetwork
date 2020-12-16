@@ -62,26 +62,6 @@ class NetworkTests: XCTestCase {
     }
     #endif
 
-    func testImageDownloadOnGlobal() {
-        let expectation = XCTestExpectation(description: "fetched from server")
-
-		let customQueue = DispatchQueue(label: "com.henrikpanhans.HPNetworkTests")
-		let request = DecodableRequest<EmptyStruct>(urlString: "https://ipapi.co/json", finishingQueue: customQueue)
-
-        Network.shared.dataTask(request) { result in
-            expectation.fulfill()
-			XCTAssertEqual(OperationQueue.main.underlyingQueue, customQueue)
-            switch result {
-            case .success(let empty):
-                print(empty)
-            case .failure(let error):
-                XCTFail(error.localizedDescription)
-            }
-        }
-
-        wait(for: [expectation], timeout: 20)
-    }
-
 	@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 	func testPublisher() {
 		let expectationFinished = expectation(description: "finished")
