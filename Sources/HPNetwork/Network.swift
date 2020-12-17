@@ -34,10 +34,7 @@ public class Network {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeDataTask(
-                backgroundTask: backgroundWrapper,
-                completion: completion)
-            else {
+            guard let task = request.makeDataTask(backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 
@@ -48,7 +45,6 @@ public class Network {
         return networkTask
     }
 
-    // This really needs a refactor dude
     @discardableResult
     public func uploadTask<T: NetworkRequest>(
         _ request: T,
@@ -61,11 +57,7 @@ public class Network {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(
-                data: data,
-                backgroundTask: backgroundWrapper,
-                completion: completion)
-            else {
+            guard let task = request.makeUploadTask(data: data, backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 
@@ -76,7 +68,6 @@ public class Network {
         return networkTask
     }
 
-    // This really needs a refactor dude
     @discardableResult
     public func uploadTask<T: NetworkRequest>(
         _ request: T,
@@ -89,11 +80,7 @@ public class Network {
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            guard let task = request.makeUploadTask(
-                fileURL: fileURL,
-                backgroundTask: backgroundWrapper,
-                completion: completion)
-            else {
+            guard let task = request.makeUploadTask(fileURL: fileURL, backgroundTask: backgroundWrapper, completion: completion) else {
                 return
             }
 
@@ -106,53 +93,25 @@ public class Network {
 
     // This really needs a refactor dude
     @discardableResult
-    public func downloadTask<R: NetworkRequest>(
-        _ request: R,
-        completion: @escaping (Result<URL, Error>) -> Void) -> NetworkTask
+	public func downloadTask<R: DownloadRequest>(
+		_ request: R,
+		completion: @escaping (Result<R.Output, Error>) -> Void) -> NetworkTask
     {
-        // Create a network task to immediately return
-        let downloadTask = NetworkTask()
-
-        #if os(iOS) || os(tvOS)
-        let backgroundTaskID = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
-        #endif
+		// Create a network task to immediately return
+		let networkTask = NetworkTask()
+		let backgroundWrapper = BackgroundTaskWrapper()
 
         // Go to a background queue as request.urlRequest() may do json parsing
         queue.async {
-            let session = URLSession(configuration: .default, delegate: nil, delegateQueue: .main)
+			guard let task = request.makeDownloadTask(backgroundTask: backgroundWrapper, completion: completion) else {
+				return
+			}
 
-            guard let urlRequest = request.urlRequest() else {
-                completion(.failure(NSError.failedToCreate))
-                return
-            }
-
-            let task = session.downloadTask(with: urlRequest) { url, response, error in
-                let result: Result<URL, Error>
-
-                if let error = error {
-                    result = .failure(error)
-                } else if let error = Network.error(from: response) {
-                    result = .failure(error)
-                } else if let url = url {
-                    result = .success(url)
-                } else {
-                    result = .failure(NSError.unknown)
-                }
-
-                request.finishingQueue.async {
-                    completion(result)
-
-                    #if os(iOS) || os(tvOS)
-                    UIApplication.shared.endBackgroundTask(backgroundTaskID)
-                    #endif
-                }
-            }
-
-            task.resume()
-            downloadTask.set(task)
+			task.resume()
+			networkTask.set(task)
         }
 
-        return downloadTask
+        return networkTask
     }
 
     // MARK: - Helpers

@@ -7,7 +7,7 @@ class NetworkTests: XCTestCase {
     func testSimpleRequest() {
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        let request = DecodableRequest<EmptyStruct>(urlString: "https://ipapi.co/json")
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
 
         Network.shared.dataTask(request) { result in
             expectation.fulfill()
@@ -20,7 +20,7 @@ class NetworkTests: XCTestCase {
     func testImageDownload() {
         let avatarURLString = "https://avatars1.githubusercontent.com/u/9870054?s=460&u=e61c5240327e9bfdb20cae7fa0570e519db6033b&v=4"
         let url = URL(string: avatarURLString)
-        let request = ImageDownloadRequest(url: url)
+		let request = BasicImageRequest(url: url, requestMethod: .get)
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
@@ -29,7 +29,7 @@ class NetworkTests: XCTestCase {
             XCTAssertTrue(Thread.isMainThread)
             switch result {
             case .success(let image):
-                print(image)
+				print(image.size)
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
@@ -43,7 +43,7 @@ class NetworkTests: XCTestCase {
     func testImageDownload() {
         let avatarURLString = "https://avatars1.githubusercontent.com/u/9870054?s=460&u=e61c5240327e9bfdb20cae7fa0570e519db6033b&v=4"
         let url = URL(string: avatarURLString)
-        let request = ImageDownloadRequest(url: url)
+		let request = BasicImageRequest(url: url, requestMethod: .get)
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
@@ -67,7 +67,7 @@ class NetworkTests: XCTestCase {
 		let expectationFinished = expectation(description: "finished")
 		let expectationReceive = expectation(description: "receiveValue")
 
-		let request = DecodableRequest<EmptyStruct>(urlString: "https://ipapi.co/json")
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
 
 		let cancellable = request.dataTaskPublisher().sink { result in
 			switch result {
@@ -110,9 +110,34 @@ class NetworkTests: XCTestCase {
 
 }
 
+struct BasicImageRequest: NetworkRequest {
+
+	#if canImport(UIKit)
+	typealias Output = UIImage
+	#elseif canImport(AppKit)
+	typealias Output = NSImage
+	#endif
+
+	let url: URL?
+	let requestMethod: RequestMethod
+
+}
+
+struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
+
+	let url: URL?
+
+	var decoder: JSONDecoder {
+		JSONDecoder()
+	}
+
+}
+
 struct FaultyRequest: NetworkRequest {
 
-	var requestMethod: NetworkRequestMethod {
+	typealias Output = Data
+
+	var requestMethod: RequestMethod {
 		.get
 	}
 

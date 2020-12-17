@@ -3,11 +3,11 @@ import Foundation
 public class NetworkResponse {
 
     public let data: Data
-    public let httpResponse: HTTPURLResponse
+    public let urlResponse: URLResponse
 
-    public init(data: Data, httpResponse: HTTPURLResponse) {
+    public init(data: Data, urlResponse: URLResponse) {
         self.data = data
-        self.httpResponse = httpResponse
+        self.urlResponse = urlResponse
     }
 
 }

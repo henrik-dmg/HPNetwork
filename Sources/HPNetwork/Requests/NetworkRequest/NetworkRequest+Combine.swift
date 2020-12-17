@@ -17,10 +17,7 @@ public extension NetworkRequest {
 					let convertedError = convertError(error, data: data, response: response)
 					throw convertedError
 				}
-				guard let urlResponse = response as? HTTPURLResponse else {
-					throw NSError.unknown
-				}
-				return NetworkResponse(data: data, httpResponse: urlResponse)
+				return NetworkResponse(data: data, urlResponse: response)
 			}
 			.tryMap(convertResponse)
 			.eraseToAnyPublisher()

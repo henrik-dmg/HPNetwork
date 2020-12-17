@@ -1,6 +1,6 @@
 import Foundation
 
-public enum NetworkRequestMethod: String {
+public enum RequestMethod: String {
 
 	case get = "GET"
 	case post = "POST"

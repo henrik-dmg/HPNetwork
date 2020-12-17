@@ -1,11 +1,15 @@
 import Foundation
 
-public struct URLQueryItemsBuilder {
+public struct URLBuilder {
+
+	// MARK: - Properties
 
     private let scheme: String
     private let host: String
     private let path: String
     private let queryItems: [URLQueryItem]
+
+	// MARK: - Init
 
     public init(scheme: String = "https", host: String) {
         self.scheme = scheme
@@ -21,42 +25,31 @@ public struct URLQueryItemsBuilder {
         self.queryItems = queryItems
     }
 
-    public func addingPathComponent(_ component: String?) -> URLQueryItemsBuilder {
+	// MARK: - Path Components
+
+    public func addingPathComponent(_ component: String?) -> URLBuilder {
         guard let component = component else {
             return self
         }
 
-        let encodedString = component.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? component
-
-        return URLQueryItemsBuilder(
+        return URLBuilder(
             scheme: scheme,
             host: host,
-            path: path + "/\(encodedString)",
+            path: path + "/\(component)",
             queryItems: queryItems
         )
     }
 
-    public func addingQueryItem(_ item: String?, name: String) -> URLQueryItemsBuilder {
-		guard let item = item else {
-			return self
-		}
+	// MARK: - Numbers
 
-        return URLQueryItemsBuilder(
-            scheme: scheme,
-            host: host,
-            path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: item)]
-        )
-    }
-
-    public func addingQueryItem(_ item: Double?, digits: Int, name: String) -> URLQueryItemsBuilder {
+    public func addingQueryItem(_ item: Double?, digits: Int, name: String) -> URLBuilder {
         guard let item = item else {
             return self
         }
 
         let formattedString = String(format: "%.\(digits)f", item)
 
-        return URLQueryItemsBuilder(
+        return URLBuilder(
             scheme: scheme,
             host: host,
             path: path,
@@ -64,12 +57,12 @@ public struct URLQueryItemsBuilder {
         )
     }
 
-    public func addingQueryItem(_ item: Int?, name: String) -> URLQueryItemsBuilder {
+    public func addingQueryItem(_ item: Int?, name: String) -> URLBuilder {
         guard let item = item else {
             return self
         }
 
-        return URLQueryItemsBuilder(
+        return URLBuilder(
             scheme: scheme,
             host: host,
             path: path,
@@ -77,14 +70,16 @@ public struct URLQueryItemsBuilder {
         )
     }
 
-    public func addingQueryItem(_ items: [String?], name: String) -> URLQueryItemsBuilder {
+	// MARK: - Arrays
+
+    public func addingQueryItem(_ items: [QueryStringConvertible?], name: String) -> URLBuilder {
         guard !items.isEmpty else {
             return self
         }
     
-        let itemsString = items.compactMap { $0 }.joined(separator: ",")
+		let itemsString = items.compactMap { $0?.queryItemRepresentation }.joined(separator: ",")
 
-        return URLQueryItemsBuilder(
+        return URLBuilder(
             scheme: scheme,
             host: host,
             path: path,
@@ -92,11 +87,44 @@ public struct URLQueryItemsBuilder {
         )
     }
 
+	public func addingQueryItem(_ items: [QueryStringConvertible]?, name: String) -> URLBuilder {
+		guard let items = items, !items.isEmpty else {
+			return self
+		}
+
+		return self.addingQueryItem(items, name: name)
+	}
+
+	public func addingQueryItem(_ items: [QueryStringConvertible?]?, name: String) -> URLBuilder {
+		guard let items = items, !items.isEmpty else {
+			return self
+		}
+
+		return self.addingQueryItem(items, name: name)
+	}
+
+	// MARK: - QueryStringConvertible
+
+	public func addingQueryItem(_ item: QueryStringConvertible?, name: String) -> URLBuilder {
+		guard let item = item else {
+			return self
+		}
+
+		return URLBuilder(
+			scheme: scheme,
+			host: host,
+			path: path,
+			queryItems: queryItems + [URLQueryItem(name: name, value: item.queryItemRepresentation)]
+		)
+	}
+
+	// MARK: - Building
+
     public func build() -> URL? {
         var components = URLComponents()
         components.scheme = scheme
         components.host = host
-        components.path = path
+		components.path = path
         components.queryItems = queryItems
 
         return components.url

@@ -4,7 +4,7 @@ import XCTest
 class URLQueryItemBuilderTests: XCTestCase {
 
     func testURL() {
-        let url = URLQueryItemsBuilder(host: "api.openweathermap.org")
+        let url = URLBuilder(host: "api.openweathermap.org")
             .addingPathComponent("data")
             .addingPathComponent("2.5")
             .addingPathComponent("onecall")

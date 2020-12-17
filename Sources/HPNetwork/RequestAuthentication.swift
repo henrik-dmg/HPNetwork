@@ -1,12 +1,12 @@
 import Foundation
 
-public enum NetworkRequestAuthentication {
+public enum RequestAuthentication {
 
     case basic(username: String, password: String)
     case raw(string: String)
     case bearer(token: String)
 
-    internal var headerString: String {
+    var headerString: String {
         switch self {
         case .basic(let username, let password):
             let loginString = String(format: "%@:%@", username, password)
@@ -19,8 +19,8 @@ public enum NetworkRequestAuthentication {
         }
     }
 
-	internal var headerField: NetworkRequestHeaderField {
-		NetworkRequestHeaderField(name: "Authorization", value: headerString)
+	var headerField: RequestHeaderField {
+		RequestHeaderField(name: "Authorization", value: headerString)
 	}
 
 }
