@@ -10,7 +10,7 @@ extension NetworkRequest {
         backgroundTask: BackgroundTaskWrapper,
         completion: @escaping (Result<Output, Error>) -> Void
 	) -> URLSessionDataTask? {
-		guard let urlRequest = makeURLRequest(completion: completion) else {
+		guard let urlRequest = makeURLRequest(backgroundTask: backgroundTask, completion: completion) else {
 			return nil
 		}
 
@@ -35,7 +35,7 @@ extension NetworkRequest {
         backgroundTask: BackgroundTaskWrapper,
         completion: @escaping (Result<Output, Error>) -> Void
 	) -> URLSessionUploadTask? {
-		guard let urlRequest = makeURLRequest(completion: completion) else {
+		guard let urlRequest = makeURLRequest(backgroundTask: backgroundTask, completion: completion) else {
 			return nil
 		}
 
@@ -58,7 +58,7 @@ extension NetworkRequest {
         backgroundTask: BackgroundTaskWrapper,
         completion: @escaping (Result<Output, Error>) -> Void
 	) -> URLSessionUploadTask? {
-		guard let urlRequest = makeURLRequest(completion: completion) else {
+		guard let urlRequest = makeURLRequest(backgroundTask: backgroundTask, completion: completion) else {
 			return nil
 		}
 
@@ -80,7 +80,7 @@ extension NetworkRequest {
 
 // MARK: - Finishing
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 import UIKit
 #endif
 
@@ -101,7 +101,7 @@ extension NetworkRequest {
 		finishingQueue.async {
 			completion(result)
 
-			#if os(iOS)
+			#if os(iOS) || os(tvOS)
 			guard let id = backgroundTask.backgroundTaskID else {
 				return
 			}

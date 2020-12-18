@@ -7,7 +7,7 @@ class NetworkTests: XCTestCase {
     func testSimpleRequest() {
         let expectation = XCTestExpectation(description: "fetched from server")
 
-		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+		let request = BasicDecodableRequest<Int>(url: URL(string: "https://ipapi.co/json"))
 
         Network.shared.dataTask(request) { result in
             expectation.fulfill()

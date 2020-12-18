@@ -1,4 +1,7 @@
 import Foundation
+#if os(iOS) || os(tvOS)
+import UIKit
+#endif
 
 // MARK: - Constructing Tasks
 
@@ -8,7 +11,7 @@ extension DownloadRequest {
 		backgroundTask: BackgroundTaskWrapper,
 		completion: @escaping (Result<URL, Error>) -> Void
 	) -> URLSessionDownloadTask? {
-		guard let urlRequest = makeURLRequest(completion: completion) else {
+		guard let urlRequest = makeURLRequest(backgroundTask: backgroundTask, completion: completion) else {
 			return nil
 		}
 
@@ -45,7 +48,7 @@ extension DownloadRequest {
 		finishingQueue.async {
 			completion(result)
 
-			#if os(iOS)
+			#if os(iOS) || os(tvOS)
 			guard let id = backgroundTask.backgroundTaskID else {
 				return
 			}

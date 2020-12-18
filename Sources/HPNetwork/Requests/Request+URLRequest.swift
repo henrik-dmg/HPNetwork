@@ -1,9 +1,12 @@
 import Foundation
+#if os(iOS) || os(tvOS)
+import UIKit
+#endif
 
 extension Request {
 
 	// Make sure background task and completion are still properly called in case the reqeust fails to construct
-	func makeURLRequest(completion: @escaping (Result<Output, Error>) -> Void) -> URLRequest? {
+	func makeURLRequest(backgroundTask: BackgroundTaskWrapper, completion: @escaping (Result<Output, Error>) -> Void) -> URLRequest? {
 		if let urlRequest = urlRequest() {
 			return urlRequest
 		}
@@ -11,7 +14,7 @@ extension Request {
 		finishingQueue.async {
 			completion(.failure(NSError.failedToCreate))
 
-			#if os(iOS)
+			#if os(iOS) || os(tvOS)
 			guard let id = backgroundTask.backgroundTaskID else {
 				return
 			}
