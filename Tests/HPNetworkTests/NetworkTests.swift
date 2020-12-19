@@ -9,7 +9,7 @@ class NetworkTests: XCTestCase {
 
 		let request = BasicDecodableRequest<Int>(url: URL(string: "https://ipapi.co/json"))
 
-        Network.shared.dataTask(request) { result in
+        Network.shared.scheduleDataTask(request) { result in
             expectation.fulfill()
         }
 
@@ -24,7 +24,7 @@ class NetworkTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        Network.shared.dataTask(request) { result in
+        Network.shared.scheduleDataTask(request) { result in
             expectation.fulfill()
             XCTAssertTrue(Thread.isMainThread)
             switch result {
@@ -47,7 +47,7 @@ class NetworkTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        Network.shared.dataTask(request) { result in
+        Network.shared.scheduleDataTask(request) { result in
             expectation.fulfill()
             XCTAssertTrue(Thread.isMainThread)
             switch result {
@@ -110,7 +110,7 @@ class NetworkTests: XCTestCase {
 
 }
 
-struct BasicImageRequest: NetworkRequest {
+struct BasicImageRequest: DataRequest {
 
 	#if canImport(UIKit)
 	typealias Output = UIImage
@@ -126,6 +126,7 @@ struct BasicImageRequest: NetworkRequest {
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 	let url: URL?
+	let requestMethod: RequestMethod = .get
 
 	var decoder: JSONDecoder {
 		JSONDecoder()
@@ -133,7 +134,7 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 }
 
-struct FaultyRequest: NetworkRequest {
+struct FaultyRequest: DataRequest {
 
 	typealias Output = Data
 

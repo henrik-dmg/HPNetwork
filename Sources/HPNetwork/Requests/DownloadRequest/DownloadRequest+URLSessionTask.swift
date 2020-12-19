@@ -1,7 +1,4 @@
 import Foundation
-#if os(iOS) || os(tvOS)
-import UIKit
-#endif
 
 // MARK: - Constructing Tasks
 
@@ -32,6 +29,10 @@ extension DownloadRequest {
 }
 
 // MARK: - Finishing
+
+#if os(iOS) || os(tvOS)
+import UIKit
+#endif
 
 extension DownloadRequest {
 

@@ -37,3 +37,6 @@ extension Float: QueryStringConvertible {}
 extension CGFloat: QueryStringConvertible {
 	public var queryItemRepresentation: String { native.queryItemRepresentation }
 }
+extension URL: QueryStringConvertible {
+	public var queryItemRepresentation: String { absoluteString }
+}

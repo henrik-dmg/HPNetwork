@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol NetworkRequest: Request {
+public protocol DataRequest: Request {
 
 	func convertResponse(response: NetworkResponse) throws -> Output
 	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error
@@ -9,7 +9,7 @@ public protocol NetworkRequest: Request {
 
 // MARK: - Convenience
 
-public extension NetworkRequest {
+public extension DataRequest {
 
 	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
 		error
@@ -19,7 +19,7 @@ public extension NetworkRequest {
 
 // MARK: - Raw Data
 
-public extension NetworkRequest where Output == Data {
+public extension DataRequest where Output == Data {
 
 	func convertResponse(response: NetworkResponse) throws -> Output {
         response.data
@@ -33,7 +33,7 @@ public extension NetworkRequest where Output == Data {
 
 import UIKit
 
-public extension NetworkRequest where Output == UIImage {
+public extension DataRequest where Output == UIImage {
 
 	func convertResponse(response: NetworkResponse) throws -> UIImage {
 		guard let image = UIImage(data: response.data) else {
@@ -48,7 +48,7 @@ public extension NetworkRequest where Output == UIImage {
 
 import AppKit
 
-public extension NetworkRequest where Output == NSImage {
+public extension DataRequest where Output == NSImage {
 
 	func convertResponse(response: NetworkResponse) throws -> NSImage {
 		guard let image = NSImage(data: response.data) else {

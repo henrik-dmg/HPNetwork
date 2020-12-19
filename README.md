@@ -22,22 +22,22 @@ Network(session: session).send(request) { result in
 }
 ```
 
-Return type is `Result<NetworkRequest.Output, Error>` where `NetworkRequest.Output` is inferred from the request object
+Return type is `Result<DataRequest.Output, Error>` where `DataRequest.Output` is inferred from the request object
 
 ## Creating Requests
 
 You can either use custom request objects like this:
 
 ```swift
-class IPLocationRequest: NetworkRequest {
+class IPLocationRequest: DataRequest {
 
     typealias Input = Data
     typealias Output = IPLocation
 
     let urlString: String = "https://ipapi.co/json"
-    let requestMethod: NetworkRequestMethod = .get
-    let authentication: NetworkRequestAuthentication? = nil
-    let headerFields: [NetworkRequestHeaderField]? = nil
+    let requestMethod: DataRequestMethod = .get
+    let authentication: DataRequestAuthentication? = nil
+    let headerFields: [DataRequestHeaderField]? = nil
 
 }
 ```

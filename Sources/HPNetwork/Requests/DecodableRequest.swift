@@ -1,16 +1,12 @@
 import Foundation
 
-public protocol DecodableRequest: NetworkRequest where Output: Decodable {
+public protocol DecodableRequest: DataRequest where Output: Decodable {
 
 	var decoder: JSONDecoder { get }
 
 }
 
 extension DecodableRequest {
-
-	public var requestMethod: RequestMethod {
-		.get
-	}
 
 	public func convertResponse(response: NetworkResponse) throws -> Output {
 		do {

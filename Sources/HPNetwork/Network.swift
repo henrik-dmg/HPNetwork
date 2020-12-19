@@ -24,7 +24,7 @@ public class Network {
 	// MARK: - Requests
 
     @discardableResult
-    public func dataTask<T: NetworkRequest>(
+    public func scheduleDataTask<T: DataRequest>(
         _ request: T,
         completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
     {
@@ -46,7 +46,7 @@ public class Network {
     }
 
     @discardableResult
-    public func uploadTask<T: NetworkRequest>(
+    public func scheduleUploadTask<T: DataRequest>(
         _ request: T,
         data: Data?,
         completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
@@ -69,7 +69,7 @@ public class Network {
     }
 
     @discardableResult
-    public func uploadTask<T: NetworkRequest>(
+    public func scheduleUploadTask<T: DataRequest>(
         _ request: T,
         fileURL: URL,
         completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask
@@ -93,7 +93,7 @@ public class Network {
 
     // This really needs a refactor dude
     @discardableResult
-	public func downloadTask<R: DownloadRequest>(
+	public func scheduleDownloadTask<R: DownloadRequest>(
 		_ request: R,
 		completion: @escaping (Result<R.Output, Error>) -> Void) -> NetworkTask
     {

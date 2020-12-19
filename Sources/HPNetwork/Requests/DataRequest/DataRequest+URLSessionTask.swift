@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Constructing Tasks
 
-extension NetworkRequest {
+extension DataRequest {
 
 	// MARK: - Data Task
 
@@ -84,7 +84,7 @@ extension NetworkRequest {
 import UIKit
 #endif
 
-extension NetworkRequest {
+extension DataRequest {
 
 	// MARK: - Data Tasks
 
