@@ -2,18 +2,18 @@
 import Foundation
 import Combine
 
-public extension DataRequest {
+public extension NetworkRequest {
 
 	@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 	func dataTaskPublisher() -> AnyPublisher<Output, Error> {
 		guard let request = urlRequest() else {
-			return DataRequestErrorPublisher<Output>(error: NSError.failedToCreate).eraseToAnyPublisher()
+			return NetworkRequestErrorPublisher<Output>(error: NSError.failedToCreate).eraseToAnyPublisher()
 		}
 
 		return urlSession.dataTaskPublisher(for: request)
 			.receive(on: finishingQueue)
 			.tryMap { data, response in
-				if let error = Network.error(from: response) {
+				if let error = response.urlError() {
 					let convertedError = convertError(error, data: data, response: response)
 					throw convertedError
 				}
@@ -26,7 +26,7 @@ public extension DataRequest {
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-struct DataRequestErrorPublisher<Output>: Publisher {
+struct NetworkRequestErrorPublisher<Output>: Publisher {
 
 	typealias Failure = Error
 

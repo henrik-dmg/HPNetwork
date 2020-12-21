@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol DecodableRequest: DataRequest where Output: Decodable {
+public protocol DecodableRequest: NetworkRequest where Output: Decodable {
 
 	var decoder: JSONDecoder { get }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum RequestAuthentication {
+public enum NetworkRequestAuthentication {
 
     case basic(username: String, password: String)
     case raw(string: String)
@@ -19,8 +19,8 @@ public enum RequestAuthentication {
         }
     }
 
-	var headerField: RequestHeaderField {
-		RequestHeaderField(name: "Authorization", value: headerString)
+	var headerField: NetworkRequestHeaderField {
+		NetworkRequestHeaderField(name: "Authorization", value: headerString)
 	}
 
 }

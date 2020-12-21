@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol Request {
+public protocol NetworkRequest {
 
 	associatedtype Output
 
@@ -11,25 +11,28 @@ public protocol Request {
 
 	var finishingQueue: DispatchQueue { get }
 	var url: URL? { get }
-	var headerFields: [RequestHeaderField]? { get }
+	var headerFields: [NetworkRequestHeaderField]? { get }
 	var httpBody: Data? { get }
-	var requestMethod: RequestMethod { get }
-	var authentication: RequestAuthentication? { get }
+	var requestMethod: NetworkRequestMethod { get }
+	var authentication: NetworkRequestAuthentication? { get }
 	var urlSession: URLSession { get }
+
+	func convertResponse(response: NetworkResponse) throws -> Output
+	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error
 
 }
 
 // Some sensible defaults
 
-public extension Request {
+public extension NetworkRequest {
 
-	var headerFields: [RequestHeaderField]? { nil }
+	var headerFields: [NetworkRequestHeaderField]? { nil }
 
 	var httpBody: Data? { nil }
 
 	var finishingQueue: DispatchQueue { .main }
 
-	var authentication: RequestAuthentication? { nil }
+	var authentication: NetworkRequestAuthentication? { nil }
 
 	var urlSession: URLSession { .shared }
 
@@ -48,6 +51,20 @@ public extension Request {
 			request.addHeaderField($0)
 		}
 		return request
+	}
+
+	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
+		error
+	}
+
+}
+
+// MARK: - Raw Data
+
+public extension NetworkRequest where Output == Data {
+
+	func convertResponse(response: NetworkResponse) throws -> Output {
+		response.data
 	}
 
 }

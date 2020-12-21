@@ -1,6 +1,10 @@
 @testable import HPNetwork
 import XCTest
-import Combine
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 class NetworkTests: XCTestCase {
 
@@ -9,7 +13,7 @@ class NetworkTests: XCTestCase {
 
 		let request = BasicDecodableRequest<Int>(url: URL(string: "https://ipapi.co/json"))
 
-        Network.shared.scheduleDataTask(request) { result in
+		Network.shared.schedule(request: request) { result in
             expectation.fulfill()
         }
 
@@ -24,8 +28,7 @@ class NetworkTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        Network.shared.scheduleDataTask(request) { result in
-            expectation.fulfill()
+		Network.shared.schedule(request: request) { result in
             XCTAssertTrue(Thread.isMainThread)
             switch result {
             case .success(let image):
@@ -33,6 +36,7 @@ class NetworkTests: XCTestCase {
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
+			expectation.fulfill()
         }
 
         wait(for: [expectation], timeout: 20)
@@ -47,16 +51,18 @@ class NetworkTests: XCTestCase {
 
         let expectation = XCTestExpectation(description: "fetched from server")
 
-        Network.shared.scheduleDataTask(request) { result in
-            expectation.fulfill()
-            XCTAssertTrue(Thread.isMainThread)
-            switch result {
-            case .success(let image):
-                print(image)
-            case .failure(let error):
-                XCTFail(error.localizedDescription)
-            }
-        }
+		Network.shared.schedule(request: request) { progress in
+			print(progress.fractionCompleted)
+		} completion: { result in
+			XCTAssertTrue(Thread.isMainThread)
+			switch result {
+			case .success(let image):
+				print(image)
+			case .failure(let error):
+				XCTFail(error.localizedDescription)
+			}
+			expectation.fulfill()
+		}
 
         wait(for: [expectation], timeout: 20)
     }
@@ -110,23 +116,52 @@ class NetworkTests: XCTestCase {
 
 }
 
-struct BasicImageRequest: DataRequest {
+#if canImport(UIKit)
 
-	#if canImport(UIKit)
+import UIKit
+
+struct BasicImageRequest: NetworkRequest {
+
 	typealias Output = UIImage
-	#elseif canImport(AppKit)
-	typealias Output = NSImage
-	#endif
 
 	let url: URL?
-	let requestMethod: RequestMethod
+	let requestMethod: NetworkRequestMethod
+
+	func convertResponse(response: NetworkResponse) throws -> UIImage {
+		guard let image = UIImage(data: response.data) else {
+			throw NSError.imageError
+		}
+		return image
+	}
 
 }
+
+#elseif canImport(AppKit)
+
+import AppKit
+
+struct BasicImageRequest: NetworkRequest {
+
+	typealias Output = NSImage
+
+	let url: URL?
+	let requestMethod: NetworkRequestMethod
+
+	func convertResponse(response: NetworkResponse) throws -> NSImage {
+		guard let image = NSImage(data: response.data) else {
+			throw NSError.imageError
+		}
+		return image
+	}
+
+}
+
+#endif
 
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 	let url: URL?
-	let requestMethod: RequestMethod = .get
+	let requestMethod: NetworkRequestMethod = .get
 
 	var decoder: JSONDecoder {
 		JSONDecoder()
@@ -134,11 +169,11 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 }
 
-struct FaultyRequest: DataRequest {
+struct FaultyRequest: NetworkRequest {
 
 	typealias Output = Data
 
-	var requestMethod: RequestMethod {
+	var requestMethod: NetworkRequestMethod {
 		.get
 	}
 
