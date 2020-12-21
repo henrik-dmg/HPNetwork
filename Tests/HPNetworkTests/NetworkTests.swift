@@ -20,6 +20,47 @@ class NetworkTests: XCTestCase {
         wait(for: [expectation], timeout: 20)
     }
 
+	func testConcurrentOperations() {
+		let network = Network.shared
+
+		let expectation = XCTestExpectation(description: "fetched request from server")
+		expectation.expectedFulfillmentCount = 20
+
+		for i in 0...20 {
+			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
+
+			network.schedule(request: request) { result in
+				print("finished request \(i)")
+				expectation.fulfill()
+			}
+		}
+
+		wait(for: [expectation], timeout: 20)
+	}
+
+	func testConcurrentOperationsMaxOne() {
+		let network = Network.shared
+		network.maximumConcurrentRequests = 1
+
+		let expectation = XCTestExpectation(description: "fetched request from server")
+		expectation.expectedFulfillmentCount = 20
+
+		var finishedRequests = [Int]()
+
+		for i in 0...20 {
+			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
+
+			network.schedule(request: request) { result in
+				finishedRequests.append(i)
+				expectation.fulfill()
+			}
+		}
+
+		wait(for: [expectation], timeout: 20)
+
+		XCTAssertEqual(finishedRequests, Array(0...19))
+	}
+
     #if canImport(UIKit)
     func testImageDownload() {
         let avatarURLString = "https://avatars1.githubusercontent.com/u/9870054?s=460&u=e61c5240327e9bfdb20cae7fa0570e519db6033b&v=4"
@@ -166,6 +207,14 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 	var decoder: JSONDecoder {
 		JSONDecoder()
 	}
+
+}
+
+struct BasicRequest: NetworkRequest {
+
+	typealias Output = Data
+	let url: URL?
+	let requestMethod: NetworkRequestMethod = .get
 
 }
 
