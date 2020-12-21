@@ -26,10 +26,12 @@ class NetworkTests: XCTestCase {
 		let expectation = XCTestExpectation(description: "fetched request from server")
 		expectation.expectedFulfillmentCount = 20
 
-		for i in 0...20 {
+		for _ in 0...20 {
 			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
 
-			network.schedule(request: request) { result in
+			network.schedule(request: request) { progress in
+//				print("Progress for request \(i):", progress.fractionCompleted)
+			} completion: { result in
 				expectation.fulfill()
 			}
 		}
@@ -68,7 +70,7 @@ class NetworkTests: XCTestCase {
 		let request = BasicRequest(url: URL(string: "https://panhans.dev/resources/random_data_10_mb"))
 
 		network.schedule(request: request) { progress in
-			print(progress.fractionCompleted)
+			//
 		} completion: { result in
 			expectation.fulfill()
 		}
@@ -168,24 +170,6 @@ class NetworkTests: XCTestCase {
 		waitForExpectations(timeout: 10) { error in
 			cancellable.cancel()
 		}
-	}
-
-	func testRandomData10MB() throws {
-		let data = try Data.generateRandomBytes(length: 10 * 1000 * 1000)
-		let url = FileManager.default.homeDirectoryForCurrentUser
-			.appendingPathComponent("Developer")
-			.appendingPathComponent("random_data_10_mb")
-
-		try data.write(to: url)
-	}
-
-	func testRandomData100MB() throws {
-		let data = try Data.generateRandomBytes(length: 100 * 1000 * 1000)
-		let url = FileManager.default.homeDirectoryForCurrentUser
-			.appendingPathComponent("Developer")
-			.appendingPathComponent("random_data_100_mb")
-
-		try data.write(to: url)
 	}
 
 }
