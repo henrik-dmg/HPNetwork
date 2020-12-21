@@ -3,6 +3,9 @@
 
 `HPNetwork` is a lightweight but customizable network stack.
 
+## Attention: HPNetwork is currently under heavy development
+Most of the refactor on the road to `v1.0` is done, but I still need to write documentation and the API may introduce breaking changes even in minor patches.
+
 ## Posting Request
 
 To submit a request, use the singleton
