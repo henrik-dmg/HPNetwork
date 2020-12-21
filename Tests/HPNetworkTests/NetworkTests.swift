@@ -30,7 +30,6 @@ class NetworkTests: XCTestCase {
 			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
 
 			network.schedule(request: request) { result in
-				print("finished request \(i)")
 				expectation.fulfill()
 			}
 		}
@@ -61,9 +60,25 @@ class NetworkTests: XCTestCase {
 		XCTAssertEqual(finishedRequests, Array(0...19))
 	}
 
+	func testLargeFileDownload() {
+		let network = Network.shared
+
+		let expectation = XCTestExpectation(description: "fetched request from server")
+
+		let request = BasicRequest(url: URL(string: "https://panhans.dev/resources/random_data_10_mb"))
+
+		network.schedule(request: request) { progress in
+			print(progress.fractionCompleted)
+		} completion: { result in
+			expectation.fulfill()
+		}
+
+		wait(for: [expectation], timeout: 40)
+	}
+
     #if canImport(UIKit)
     func testImageDownload() {
-        let avatarURLString = "https://avatars1.githubusercontent.com/u/9870054?s=460&u=e61c5240327e9bfdb20cae7fa0570e519db6033b&v=4"
+        let avatarURLString = "https://panhans.dev/Ugly-Separators.png"
         let url = URL(string: avatarURLString)
 		let request = BasicImageRequest(url: url, requestMethod: .get)
 
@@ -86,7 +101,7 @@ class NetworkTests: XCTestCase {
 
     #if canImport(AppKit)
     func testImageDownload() {
-        let avatarURLString = "https://avatars1.githubusercontent.com/u/9870054?s=460&u=e61c5240327e9bfdb20cae7fa0570e519db6033b&v=4"
+        let avatarURLString = "https://panhans.dev/Ugly-Separators.png"
         let url = URL(string: avatarURLString)
 		let request = BasicImageRequest(url: url, requestMethod: .get)
 
@@ -152,6 +167,40 @@ class NetworkTests: XCTestCase {
 
 		waitForExpectations(timeout: 10) { error in
 			cancellable.cancel()
+		}
+	}
+
+	func testRandomData10MB() throws {
+		let data = try Data.generateRandomBytes(length: 10 * 1000 * 1000)
+		let url = FileManager.default.homeDirectoryForCurrentUser
+			.appendingPathComponent("Developer")
+			.appendingPathComponent("random_data_10_mb")
+
+		try data.write(to: url)
+	}
+
+	func testRandomData100MB() throws {
+		let data = try Data.generateRandomBytes(length: 100 * 1000 * 1000)
+		let url = FileManager.default.homeDirectoryForCurrentUser
+			.appendingPathComponent("Developer")
+			.appendingPathComponent("random_data_100_mb")
+
+		try data.write(to: url)
+	}
+
+}
+
+extension Data {
+
+	static func generateRandomBytes(length: Int) throws -> Data {
+		var keyData = Data(count: length)
+		let result = keyData.withUnsafeMutableBytes {
+			SecRandomCopyBytes(kSecRandomDefault, length, $0.baseAddress!)
+		}
+		if result == errSecSuccess {
+			return keyData
+		} else {
+			throw NSError(description: "Problem occured while generating random data")
 		}
 	}
 
