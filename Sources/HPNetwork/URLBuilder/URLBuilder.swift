@@ -72,35 +72,19 @@ public struct URLBuilder {
 
 	// MARK: - Arrays
 
-    public func addingQueryItem(_ items: [QueryStringConvertible?], name: String) -> URLBuilder {
-        guard !items.isEmpty else {
-            return self
-        }
-    
-		let itemsString = items.compactMap { $0?.queryItemRepresentation }.joined(separator: ",")
-
-        return URLBuilder(
-            scheme: scheme,
-            host: host,
-            path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: itemsString)]
-        )
-    }
-
-	public func addingQueryItem(_ items: [QueryStringConvertible]?, name: String) -> URLBuilder {
-		guard let items = items, !items.isEmpty else {
-			return self
-		}
-
-		return self.addingQueryItem(items, name: name)
-	}
-
 	public func addingQueryItem(_ items: [QueryStringConvertible?]?, name: String) -> URLBuilder {
 		guard let items = items, !items.isEmpty else {
 			return self
 		}
 
-		return self.addingQueryItem(items, name: name)
+		let itemsString = items.compactMap { $0?.queryItemRepresentation }.joined(separator: ",")
+
+		return URLBuilder(
+			scheme: scheme,
+			host: host,
+			path: path,
+			queryItems: queryItems + [URLQueryItem(name: name, value: itemsString)]
+		)
 	}
 
 	// MARK: - QueryStringConvertible

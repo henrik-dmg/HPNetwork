@@ -59,6 +59,6 @@ DecodableRequest<IPLocation>(
 Any call to `send(request) { result in ... }` returns an instance of `NetworkTask` that you can cancel by calling `task.cancel()`
 
 ## WIP
-
-- [ ] Adding ability to add HTTP body data
+- [ ] Cancellation support
+- [ ] Cookie support
 - [ ] Improving the documentation

@@ -17,4 +17,31 @@ class URLQueryItemBuilderTests: XCTestCase {
         XCTAssertEqual(url?.absoluteString, "https://api.openweathermap.org/data/2.5/onecall?lat=48.12312&lon=-12.91230&appid=apiKey&units=metric")
     }
 
+	func testNilArrayItem() {
+		let numbers: [Int]? = [1, 61, 34, 89]
+		let url = URLBuilder(host: "panhans.dev")
+			.addingQueryItem(numbers, name: "test")
+			.build()
+
+		XCTAssertEqual(url?.absoluteString, "https://panhans.dev?test=1,61,34,89")
+	}
+
+	func testArrayNilItems() {
+		let numbers: [Int?] = [1, 34, nil, 89, nil]
+		let url = URLBuilder(host: "panhans.dev")
+			.addingQueryItem(numbers, name: "test")
+			.build()
+
+		XCTAssertEqual(url?.absoluteString, "https://panhans.dev?test=1,34,89")
+	}
+
+	func testNilArrayNilItems() {
+		let numbers: [Int?]? = [9, 34, nil, 56, nil]
+		let url = URLBuilder(host: "panhans.dev")
+			.addingQueryItem(numbers, name: "test")
+			.build()
+
+		XCTAssertEqual(url?.absoluteString, "https://panhans.dev?test=9,34,56")
+	}
+
 }
