@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public typealias ProgressHandler = (Progress) -> Void
 
@@ -10,6 +13,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 	let request: R
 	let progressHandler: ProgressHandler?
 	var networkCompletionBlock: Completion?
+	let networkTask = NetworkTask()
 
 	private var data: Data?
 	private var response: URLResponse?
@@ -29,17 +33,14 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 	}
 
 	override func cancel() {
-		let cancelledBeforeExecution = !isExecuting && !isFinished && !isCancelled
 		super.cancel()
 
-		// If we are cancelled before being started, then `main` and `networkOperationCompletionBlock` are never executed so we ensure
-		// that a cancel error is delivered.
-		if cancelledBeforeExecution {
-			if let error = error {
-				finish(with: .failure(error))
-			} else {
-				finish(with: .failure(NSError.cancelledNetworkOperation))
-			}
+		networkTask.cancel()
+
+		if let error = error {
+			finish(with: .failure(error))
+		} else {
+			finish(with: .failure(NSError.cancelledNetworkOperation))
 		}
 	}
 
@@ -47,6 +48,10 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		guard let urlRequest = request.urlRequest() else {
 			return
 		}
+
+		#if canImport(UIKit)
+		let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
+		#endif
 
 		let semaphore = DispatchSemaphore(value: 0)
 
@@ -67,9 +72,14 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 			}
 		}
 
+		networkTask.set(task)
 		task.resume()
 		semaphore.wait()
 		observation?.invalidate()
+
+		#if canImport(UIKit)
+		UIApplication.shared.endBackgroundTask(backgroundTask)
+		#endif
 	}
 
 	private func finish(with result: RequestResult) {

@@ -1,7 +1,4 @@
 import Foundation
-#if canImport(UIKit)
-import UIKit
-#endif
 
 public class Network {
 
@@ -39,10 +36,12 @@ public class Network {
 
 	// MARK: - Requests
 
-	public func schedule<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping (Result<T.Output, Error>) -> Void) {
+	@discardableResult
+	public func schedule<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask {
 		let operation = NetworkOperation(request: request, progressHandler: progressHandler)
 		operation.networkCompletionBlock = completion
 		operationQueue.addOperation(operation)
+		return operation.networkTask
     }
 
 }

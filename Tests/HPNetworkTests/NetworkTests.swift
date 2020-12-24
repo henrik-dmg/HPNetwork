@@ -172,6 +172,25 @@ class NetworkTests: XCTestCase {
 		}
 	}
 
+	func testCancellingRequest() {
+		let expectation = XCTestExpectation(description: "fetched from server")
+
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+
+		let task = Network.shared.schedule(request: request) { result in
+			switch result {
+			case .success(let empty):
+				XCTFail()
+			case .failure(let error as NSError):
+				print(error)
+			}
+			expectation.fulfill()
+		}
+		task.cancel()
+
+		wait(for: [expectation], timeout: 20)
+	}
+
 }
 
 extension Data {
