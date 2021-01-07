@@ -49,7 +49,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 			return
 		}
 
-		#if canImport(UIKit)
+		#if os(iOS) || os(tvOS)
 		let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
 		#endif
 
@@ -77,7 +77,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		semaphore.wait()
 		observation?.invalidate()
 
-		#if canImport(UIKit)
+		#if os(iOS) || os(tvOS)
 		UIApplication.shared.endBackgroundTask(backgroundTask)
 		#endif
 	}
