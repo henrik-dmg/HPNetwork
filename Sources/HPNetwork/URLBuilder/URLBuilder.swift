@@ -109,9 +109,17 @@ public struct URLBuilder {
         components.scheme = scheme
         components.host = host
 		components.path = path
-        components.queryItems = queryItems
+		components.queryItems = queryItems.nilIfEmpty()
 
         return components.url
     }
+
+}
+
+private extension Array {
+
+	func nilIfEmpty() -> Self? {
+		isEmpty ? nil : self
+	}
 
 }

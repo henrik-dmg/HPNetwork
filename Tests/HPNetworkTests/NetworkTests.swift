@@ -179,7 +179,7 @@ class NetworkTests: XCTestCase {
 
 		let task = Network.shared.schedule(request: request) { result in
 			switch result {
-			case .success(let empty):
+			case .success:
 				XCTFail()
 			case .failure(let error as NSError):
 				print(error)
