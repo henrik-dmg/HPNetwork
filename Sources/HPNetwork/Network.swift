@@ -37,29 +37,11 @@ public class Network {
 	// MARK: - Requests
 
 	@discardableResult
-	public func schedule<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping (Result<T.Output, Error>) -> Void) -> NetworkTask {
+	public func schedule<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping T.Completion) -> NetworkTask {
 		let operation = NetworkOperation(request: request, progressHandler: progressHandler)
 		operation.networkCompletionBlock = completion
 		operationQueue.addOperation(operation)
 		return operation.networkTask
     }
-
-}
-
-extension URLResponse {
-
-	func urlError() -> URLError? {
-		guard let httpResponse = self as? HTTPURLResponse else {
-			return nil
-		}
-
-		switch httpResponse.statusCode {
-		case 200...299:
-			return nil
-		default:
-			let errorCode = URLError.Code(rawValue: httpResponse.statusCode)
-			return URLError(errorCode)
-		}
-	}
 
 }

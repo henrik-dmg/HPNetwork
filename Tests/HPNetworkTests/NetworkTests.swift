@@ -21,17 +21,13 @@ class NetworkTests: XCTestCase {
     }
 
 	func testConcurrentOperations() {
-		let network = Network.shared
-
 		let expectation = XCTestExpectation(description: "fetched request from server")
 		expectation.expectedFulfillmentCount = 20
 
 		for _ in 0...20 {
 			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
 
-			network.schedule(request: request) { progress in
-//				print("Progress for request \(i):", progress.fractionCompleted)
-			} completion: { result in
+			request.schedule { _ in
 				expectation.fulfill()
 			}
 		}

@@ -7,12 +7,9 @@ public typealias ProgressHandler = (Progress) -> Void
 
 class NetworkOperation<R: NetworkRequest>: Operation {
 
-	typealias RequestResult = Result<R.Output, Error>
-	typealias Completion = (Result<R.Output, Error>) -> Void
-
 	let request: R
 	let progressHandler: ProgressHandler?
-	var networkCompletionBlock: Completion?
+	var networkCompletionBlock: R.Completion?
 	let networkTask = NetworkTask()
 
 	private var data: Data?
@@ -82,7 +79,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		#endif
 	}
 
-	private func finish(with result: RequestResult) {
+	private func finish(with result: R.RequestResult) {
 		request.finishingQueue.sync {
 			networkCompletionBlock?(result)
 			networkCompletionBlock = nil

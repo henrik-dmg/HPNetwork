@@ -5,7 +5,6 @@ public enum NetworkRequestAuthentication {
     case basic(username: String, password: String)
     case raw(string: String)
     case bearer(token: String)
-	case musicUserToken(token: String)
 
     var headerString: String {
         switch self {
@@ -17,17 +16,11 @@ public enum NetworkRequestAuthentication {
             return string
         case .bearer(let token):
             return "Bearer \(token)"
-		case .musicUserToken(let token):
-			return token
         }
     }
 
 	var headerField: NetworkRequestHeaderField {
-		if case .musicUserToken = self {
-			return NetworkRequestHeaderField(name: "Music-User-Token", value: headerString)
-		} else {
-			return NetworkRequestHeaderField(name: "Authorization", value: headerString)
-		}
+		NetworkRequestHeaderField(name: "Authorization", value: headerString)
 	}
 
 }

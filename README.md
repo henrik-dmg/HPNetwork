@@ -16,7 +16,13 @@ Network.shared.schedule(request) { result in
     }
 }
 ```
-The `result` is `Result<DataRequest.Output, Error>` where `DataRequest.Output` is inferred from the request object.
+of with the convenience method:
+```swift
+request.schedule { result in
+	// Handle result
+}
+```
+The `result` is `Result<Request.Output, Error>` where `Request.Output` is inferred from the request object.
 `Network.shared` will do its networking on “com.henrikpanhans.Network” (which is a concurrent queue). If you want to use a custom queue, you can pass it in the initialiser:
 
 ```swift
@@ -60,7 +66,7 @@ struct BasicDataRequest: NetworkRequest {
 }
 
 let basicRequest = BasicDataRequest(
-    url: URL(string: "https://panhans.dev/index.html"),
+    url: URL(string: "https://panhans.dev/"),
     requestMethod: .get
 )
 ```
@@ -83,7 +89,7 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 ```
 
 ### Combine
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get an instance of `AnyPublisher<NetworkRequest.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
+You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get an instance of `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
 
 ### Intercepting Errors
 By default, instances of `NetworkRequest` will simply forward any encountered errors to the completion block. If you want to do some custom error conversion based on the raw `Data` that was received, you can implement `func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error` in your request model.
