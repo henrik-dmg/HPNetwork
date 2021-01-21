@@ -20,7 +20,7 @@ public extension NetworkRequest {
 				.eraseToAnyPublisher()
 		} else {
 			return Future<Output, Error> { completion in
-				completion(.failure(NSError.failedToCreate))
+				completion(.failure(NSError.failedToCreateRequest))
 			}.eraseToAnyPublisher()
 		}
 	}

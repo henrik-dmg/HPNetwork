@@ -1,7 +1,7 @@
 # HPNetwork
 ![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
 
-`HPNetwork` is a lightweight but customizable network stack.
+`HPNetwork` is a protocol-based networking stack written in pure Swift
 
 ## Posting Request
 
@@ -35,7 +35,7 @@ You can limit the maximum number of concurrent requests to be executed by settin
 ## Creating Requests
 
 ### Basics
-HPNetwork is following a rather protocol based approach, so to schedule a request, it has to conform to `NetworkRequest`. In the most simple terms, that means you supply a `URL` and a request method. 
+HPNetwork is following a rather protocol based approach, so any type that conforms to `NetworkRequest` can be scheduled as a request. In the most simple terms, that means you supply a `URL` and a request method. 
 
 #### Example 1:
 ```swift
@@ -89,7 +89,7 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 ```
 
 ### Combine
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get an instance of `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
+You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
 
 ### Intercepting Errors
 By default, instances of `NetworkRequest` will simply forward any encountered errors to the completion block. If you want to do some custom error conversion based on the raw `Data` that was received, you can implement `func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error` in your request model.

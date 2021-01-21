@@ -85,8 +85,8 @@ class NetworkTests: XCTestCase {
 		Network.shared.schedule(request: request) { result in
             XCTAssertTrue(Thread.isMainThread)
             switch result {
-            case .success(let image):
-				print(image.size)
+            case .success:
+				break
             case .failure(let error):
                 XCTFail(error.localizedDescription)
             }
@@ -110,8 +110,8 @@ class NetworkTests: XCTestCase {
 		} completion: { result in
 			XCTAssertTrue(Thread.isMainThread)
 			switch result {
-			case .success(let image):
-				print(image)
+			case .success:
+				break
 			case .failure(let error):
 				XCTFail(error.localizedDescription)
 			}
@@ -154,7 +154,7 @@ class NetworkTests: XCTestCase {
 		let cancellable = request.dataTaskPublisher().sink { result in
 			switch result {
 			case .failure(let error as NSError):
-				XCTAssertEqual(error, NSError.failedToCreate)
+				XCTAssertEqual(error, NSError.failedToCreateRequest)
 				expectationFinished.fulfill()
 			case .finished:
 				XCTFail("Networking should not be successful")

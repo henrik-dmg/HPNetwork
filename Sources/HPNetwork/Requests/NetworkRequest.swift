@@ -25,9 +25,6 @@ public protocol NetworkRequest {
 
 extension NetworkRequest {
 
-	/**
-	 Generates a URLRequest from the request. This will be run on a background thread so model parsing is allowed.
-	 */
 	func urlRequest() -> URLRequest? {
 		guard let url = url else {
 			return nil

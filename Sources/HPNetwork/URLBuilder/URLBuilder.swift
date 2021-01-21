@@ -18,7 +18,7 @@ public struct URLBuilder {
         self.queryItems = []
     }
 
-    internal init(scheme: String = "https", host: String, path: String, queryItems: [URLQueryItem]) {
+    private init(scheme: String = "https", host: String, path: String, queryItems: [URLQueryItem]) {
         self.scheme = scheme
         self.host = host
         self.path = path

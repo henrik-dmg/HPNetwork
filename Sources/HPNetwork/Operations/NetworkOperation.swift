@@ -43,6 +43,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 
 	func executeNetworkRequest() {
 		guard let urlRequest = request.urlRequest() else {
+			error = NSError.failedToCreateRequest
 			return
 		}
 
