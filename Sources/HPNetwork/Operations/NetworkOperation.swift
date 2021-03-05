@@ -41,12 +41,16 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		}
 	}
 
-	func executeNetworkRequest() {
-		guard let urlRequest = request.urlRequest() else {
-			error = NSError.failedToCreateRequest
-			return
+	private func executeNetworkRequest() {
+		do {
+			let urlRequest = try request.makeURLRequest()
+			executeNetworkRequest(with: urlRequest)
+		} catch let error {
+			self.error = error
 		}
+	}
 
+	private func executeNetworkRequest(with urlRequest: URLRequest) {
 		#if os(iOS) || os(tvOS)
 		let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
 		#endif

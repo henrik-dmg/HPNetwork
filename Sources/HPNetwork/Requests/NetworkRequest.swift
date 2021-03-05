@@ -25,16 +25,19 @@ public protocol NetworkRequest {
 
 extension NetworkRequest {
 
-	func urlRequest() -> URLRequest? {
+	func makeURLRequest() throws -> URLRequest {
 		guard let url = url else {
-			return nil
+			throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
 		}
 
 		var request = URLRequest(url: url)
 		request.httpMethod = requestMethod.rawValue
 		request.httpBody = httpBody
 		if let auth = authentication {
-			request.addHeaderField(auth.headerField)
+			guard let field = auth.headerField else {
+				throw NSError.failedToCreateRequest.withFailureReason("Could not create authorisation header field: \(auth)")
+			}
+			request.addHeaderField(field)
 		}
 		headerFields?.forEach {
 			request.addHeaderField($0)

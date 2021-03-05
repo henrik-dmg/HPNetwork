@@ -30,7 +30,7 @@ let customQueue = DispatchQueue(label: "com.henrikpanhans.CustomQueue", qos: .us
 let network = Network(queue: customQueue)
 ```
 
-You can limit the maximum number of concurrent requests to be executed by settings `Network.shared.maximumConcurrentRequests = 5` for example
+You can limit the maximum number of concurrent requests to be executed by setting `Network.shared.maximumConcurrentRequests = 5` for example
 
 ## Creating Requests
 

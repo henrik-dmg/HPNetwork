@@ -10,6 +10,12 @@ extension NSError {
         return NSError(domain: domain, code: code, userInfo: dict)
     }
 
+	func withFailureReason(_ reason: String) -> NSError {
+		var dict = userInfo
+		dict[NSLocalizedFailureReasonErrorKey] = reason
+		return NSError(domain: domain, code: code, userInfo: dict)
+	}
+
     func injectJSON(_ data: Data) -> NSError {
 		let jsonString = data.prettyPrintedJSONString
 

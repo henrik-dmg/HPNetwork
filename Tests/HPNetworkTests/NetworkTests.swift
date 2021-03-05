@@ -65,9 +65,7 @@ class NetworkTests: XCTestCase {
 
 		let request = BasicRequest(url: URL(string: "https://panhans.dev/resources/random_data_10_mb"))
 
-		network.schedule(request: request) { progress in
-			//
-		} completion: { result in
+		network.schedule(request: request) { result in
 			expectation.fulfill()
 		}
 
@@ -76,7 +74,7 @@ class NetworkTests: XCTestCase {
 
     #if canImport(UIKit)
     func testImageDownload() {
-        let avatarURLString = "https://panhans.dev/Ugly-Separators.png"
+        let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
         let url = URL(string: avatarURLString)
 		let request = BasicImageRequest(url: url, requestMethod: .get)
 
@@ -99,7 +97,7 @@ class NetworkTests: XCTestCase {
 
     #if canImport(AppKit)
     func testImageDownload() {
-        let avatarURLString = "https://panhans.dev/Ugly-Separators.png"
+        let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
         let url = URL(string: avatarURLString)
 		let request = BasicImageRequest(url: url, requestMethod: .get)
 
@@ -154,7 +152,7 @@ class NetworkTests: XCTestCase {
 		let cancellable = request.dataTaskPublisher().sink { result in
 			switch result {
 			case .failure(let error as NSError):
-				XCTAssertEqual(error, NSError.failedToCreateRequest)
+				XCTAssertEqual(error, NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil"))
 				expectationFinished.fulfill()
 			case .finished:
 				XCTFail("Networking should not be successful")
@@ -185,22 +183,6 @@ class NetworkTests: XCTestCase {
 		task.cancel()
 
 		wait(for: [expectation], timeout: 20)
-	}
-
-}
-
-extension Data {
-
-	static func generateRandomBytes(length: Int) throws -> Data {
-		var keyData = Data(count: length)
-		let result = keyData.withUnsafeMutableBytes {
-			SecRandomCopyBytes(kSecRandomDefault, length, $0.baseAddress!)
-		}
-		if result == errSecSuccess {
-			return keyData
-		} else {
-			throw NSError(description: "Problem occured while generating random data")
-		}
 	}
 
 }

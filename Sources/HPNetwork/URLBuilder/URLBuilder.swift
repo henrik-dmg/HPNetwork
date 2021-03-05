@@ -42,12 +42,12 @@ public struct URLBuilder {
 
 	// MARK: - Numbers
 
-    public func addingQueryItem(_ item: Double?, digits: Int, name: String) -> URLBuilder {
-        guard let item = item else {
+    public func addingQueryItem(name: String, value: Double?, digits: Int = 2) -> URLBuilder {
+        guard let value = value else {
             return self
         }
 
-        let formattedString = String(format: "%.\(digits)f", item)
+        let formattedString = String(format: "%.\(digits)f", value)
 
         return URLBuilder(
             scheme: scheme,
@@ -57,27 +57,14 @@ public struct URLBuilder {
         )
     }
 
-    public func addingQueryItem(_ item: Int?, name: String) -> URLBuilder {
-        guard let item = item else {
-            return self
-        }
-
-        return URLBuilder(
-            scheme: scheme,
-            host: host,
-            path: path,
-            queryItems: queryItems + [URLQueryItem(name: name, value: "\(item)")]
-        )
-    }
-
 	// MARK: - Arrays
 
-	public func addingQueryItem(_ items: [QueryStringConvertible?]?, name: String) -> URLBuilder {
-		guard let items = items, !items.isEmpty else {
+	public func addingQueryItem(name: String, value: [QueryStringConvertible?]?) -> URLBuilder {
+		guard let value = value, !value.isEmpty else {
 			return self
 		}
 
-		let itemsString = items.compactMap { $0?.queryItemRepresentation }.joined(separator: ",")
+		let itemsString = value.compactMap { $0?.queryItemRepresentation }.joined(separator: ",")
 
 		return URLBuilder(
 			scheme: scheme,
@@ -89,8 +76,8 @@ public struct URLBuilder {
 
 	// MARK: - QueryStringConvertible
 
-	public func addingQueryItem(_ item: QueryStringConvertible?, name: String) -> URLBuilder {
-		guard let item = item else {
+	public func addingQueryItem(name: String, value: QueryStringConvertible?) -> URLBuilder {
+		guard let value = value else {
 			return self
 		}
 
@@ -98,7 +85,7 @@ public struct URLBuilder {
 			scheme: scheme,
 			host: host,
 			path: path,
-			queryItems: queryItems + [URLQueryItem(name: name, value: item.queryItemRepresentation)]
+			queryItems: queryItems + [URLQueryItem(name: name, value: value.queryItemRepresentation)]
 		)
 	}
 

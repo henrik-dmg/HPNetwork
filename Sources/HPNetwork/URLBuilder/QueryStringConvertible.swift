@@ -34,9 +34,19 @@ extension UInt16: QueryStringConvertible {}
 extension UInt8: QueryStringConvertible {}
 extension Double: QueryStringConvertible {}
 extension Float: QueryStringConvertible {}
+
 extension CGFloat: QueryStringConvertible {
-	public var queryItemRepresentation: String { native.queryItemRepresentation }
+
+	public var queryItemRepresentation: String {
+		native.queryItemRepresentation
+	}
+
 }
+
 extension URL: QueryStringConvertible {
-	public var queryItemRepresentation: String { absoluteString }
+
+	public var queryItemRepresentation: String {
+		absoluteString
+	}
+
 }
