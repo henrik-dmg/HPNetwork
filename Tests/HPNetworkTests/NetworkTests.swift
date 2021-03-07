@@ -185,6 +185,28 @@ class NetworkTests: XCTestCase {
 		wait(for: [expectation], timeout: 20)
 	}
 
+	func testSync() {
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+		let result = Network.shared.scheduleSynchronously(request: request)
+		switch result {
+		case .success:
+			break
+		case .failure(let error):
+			XCTFail(error.localizedDescription)
+		}
+	}
+
+	func testSync2() {
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+		let result = request.scheduleSynchronously(on: .shared)
+		switch result {
+		case .success:
+			break
+		case .failure(let error):
+			XCTFail(error.localizedDescription)
+		}
+	}
+
 }
 
 #if canImport(UIKit)

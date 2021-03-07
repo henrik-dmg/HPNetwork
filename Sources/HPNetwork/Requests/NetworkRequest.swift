@@ -70,6 +70,10 @@ public extension NetworkRequest {
 		network.schedule(request: self, progressHandler: progressHandler, completion: completion)
 	}
 
+	func scheduleSynchronously(on network: Network = .shared, progressHandler: ProgressHandler? = nil) -> RequestResult {
+		network.scheduleSynchronously(request: self, progressHandler: progressHandler)
+	}
+
 }
 
 // MARK: - Raw Data

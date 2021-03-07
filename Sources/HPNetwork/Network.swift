@@ -44,4 +44,19 @@ public class Network {
 		return operation.networkTask
     }
 
+	public func scheduleSynchronously<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil) -> T.RequestResult {
+		var result: T.RequestResult?
+		let semaphore = RunLoopSemaphore(queue: request.finishingQueue)
+
+		schedule(request: request, progressHandler: progressHandler) { requestResult in
+			result = requestResult
+			semaphore.signal()
+		}
+
+		let dispatchTime = DispatchTime.now() + request.urlSession.configuration.timeoutIntervalForRequest
+		semaphore.wait(timeout: dispatchTime)
+
+		return result ?? .failure(NSError.unknown)
+	}
+
 }
