@@ -37,6 +37,30 @@ let network = Network(queue: customQueue)
 
 You can limit the maximum number of concurrent requests to be executed by setting `Network.shared.maximumConcurrentRequests = 5` for example
 
+### Combine
+
+You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
+
+### Progress Callback
+
+You can pass a progress handler block to `Network` like this:
+
+```swift
+Network.shared.schedule(request: request) { progress in
+    print(progress.fractionComplete)
+} completion: { result in
+    // Result handling as usual
+}
+```
+
+### Synchronous Requests
+
+If you do stuff like writing CLIs with Swift or need to do synchronous networking for any reason, you can use `scheduleSynchronously(...)` which returns the same `Result<NetworkRequest.Output, Error>` as in the closure of the regular method call. There's also a convenience method for `NetworkRequest` directly which you can call by `request.scheduleSynchronously(...)`
+
+### Cancelling Requests
+
+Any call to `schedule(request) { result in ... }` returns an instance of `NetworkTask` that you can cancel by calling `task.cancel()`
+
 ## Creating Requests
 
 ### Basics
@@ -98,33 +122,9 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 }
 ```
 
-### Combine
-
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
-
 ### Intercepting Errors
 
 By default, instances of `NetworkRequest` will simply forward any encountered errors to the completion block. If you want to do some custom error conversion based on the raw `Data` that was received, you can implement `func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error` in your request model.
-
-### Progress Callback
-
-You can pass a progress handler block to `Network` like this:
-
-```swift
-Network.shared.schedule(request: request) { progress in
-    print(progress.fractionComplete)
-} completion: { result in
-    // Result handling as usual
-}
-```
-
-### Synchronous Requests
-
-If you do stuff like writing CLIs with Swift or need to do synchronous networking for any reason, you can use `scheduleSynchronously(...)` which returns the same `Result<NetworkRequest.Output, Error>` as in the closure of the regular method call. There's also a convenience method for `NetworkRequest` directly which you can call by `request.scheduleSynchronously(...)`
-
-### Cancelling Requests
-
-Any call to `schedule(request) { result in ... }` returns an instance of `NetworkTask` that you can cancel by calling `task.cancel()`
 
 ### URLBuilder
 
