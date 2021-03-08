@@ -16,8 +16,7 @@ extension NetworkRequest {
 				let output = try convertResponse(response: response)
 				result = .success(output)
 			} catch let error {
-				let convertedError = convertError(error, data: data, response: response)
-				result = .failure(convertedError)
+				result = .failure(error)
 			}
 		} else {
 			result = .failure(NSError.unknown)
