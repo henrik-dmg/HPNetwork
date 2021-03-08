@@ -150,7 +150,7 @@ To add authentication to a request, simply supply a `authentication: NetworkRequ
 
 ### Everything else
 
-Things like `httpBody: Data?`, `authentication: NetworkRequestAuthentication?` and `headerFields: [NetworkRequestHeaderField]` should be pretty self-explanatory so I'm gonna let you figure those out on your own.
+Things like `httpBody: Data?` and `headerFields: [NetworkRequestHeaderField]` should be pretty self-explanatory so I'm gonna let you figure those out on your own.
 
 ## WIP
 
