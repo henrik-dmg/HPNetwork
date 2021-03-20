@@ -10,11 +10,15 @@ public protocol NetworkRequest {
 	typealias Completion = (RequestResult) -> Void
 
 	var finishingQueue: DispatchQueue { get }
+	@available(*, deprecated, message: "Please use makeURL instead, this property will be removed in a future release")
 	var url: URL? { get }
 	var httpBody: Data? { get }
 	var urlSession: URLSession { get }
 
+	func makeURL() throws -> URL
+
 	var headerFields: [NetworkRequestHeaderField]? { get }
+	/// The request method that will be used
 	var requestMethod: NetworkRequestMethod { get }
 	var authentication: NetworkRequestAuthentication? { get }
 
@@ -26,9 +30,7 @@ public protocol NetworkRequest {
 extension NetworkRequest {
 
 	func makeURLRequest() throws -> URLRequest {
-		guard let url = url else {
-			throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
-		}
+		let url = try makeURL()
 
 		var request = URLRequest(url: url)
 		request.httpMethod = requestMethod.rawValue
@@ -60,6 +62,13 @@ public extension NetworkRequest {
 	var headerFields: [NetworkRequestHeaderField]? { nil }
 
 	var authentication: NetworkRequestAuthentication? { nil }
+
+	func makeURL() throws -> URL {
+		guard let url = url else {
+			throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
+		}
+		return url
+	}
 
 	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
 		error
