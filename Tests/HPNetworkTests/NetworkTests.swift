@@ -247,6 +247,13 @@ struct BasicImageRequest: NetworkRequest {
 		return image
 	}
 
+	func makeURL() throws -> URL {
+		guard let url = url else {
+			throw NSError.failedToCreateRequest
+		}
+		return url
+	}
+
 }
 
 #endif
@@ -260,6 +267,13 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 		JSONDecoder()
 	}
 
+	func makeURL() throws -> URL {
+		guard let url = url else {
+			throw NSError.failedToCreateRequest
+		}
+		return url
+	}
+
 }
 
 struct BasicRequest: NetworkRequest {
@@ -267,6 +281,13 @@ struct BasicRequest: NetworkRequest {
 	typealias Output = Data
 	let url: URL?
 	let requestMethod: NetworkRequestMethod = .get
+
+	func makeURL() throws -> URL {
+		guard let url = url else {
+			throw NSError.failedToCreateRequest
+		}
+		return url
+	}
 
 }
 
@@ -278,8 +299,8 @@ struct FaultyRequest: NetworkRequest {
 		.get
 	}
 
-	var url: URL? {
-		nil
+	func makeURL() throws -> URL {
+		throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
 	}
 
 }
