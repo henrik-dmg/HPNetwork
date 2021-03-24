@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HPNetwork"
-  s.version      = "2.0.0"
+  s.version      = "2.0.1"
   s.summary      = "A lightweight but customisable networking stack written in Swift"
 
   s.homepage     = "https://panhans.dev/opensource/hpnetwork"

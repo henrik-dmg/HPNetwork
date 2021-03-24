@@ -101,6 +101,13 @@ public struct URLBuilder {
         return components.url
     }
 
+	public func buildThrowing() throws -> URL {
+		guard let url = build() else {
+			throw NSError.urlBuilderFailed
+		}
+		return url
+	}
+
 }
 
 private extension Array {
