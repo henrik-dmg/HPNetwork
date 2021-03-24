@@ -74,13 +74,13 @@ struct BasicDataRequest: NetworkRequest {
 
     typealias Output = Data
 
-    var url: URL? {
-        // construct your URL here
-    }
-
     var requestMethod: NetworkRequestMethod {
         .get
     }
+    
+    func makeURL() throws -> URL {
+		// construct your URL here
+	}
 
 }
 ```
@@ -94,6 +94,10 @@ struct BasicDataRequest: NetworkRequest {
 
     let url: URL?
     let requestMethod: NetworkRequestMethod
+    
+    func makeURL() throws -> URL {
+		// construct your URL here
+	}
 
 }
 
@@ -112,12 +116,15 @@ If you're working with JSON, you can also use `DecodableRequest` which requires 
 ```swift
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
-    let url: URL?
     let requestMethod: NetworkRequestMethod
 
     var decoder: JSONDecoder {
         JSONDecoder() // use default or custom decoder
     }
+    
+    func makeURL() throws -> URL {
+		// construct your URL here
+	}
 
 }
 ```
@@ -139,7 +146,7 @@ URLBuilder(host: "api.openweathermap.org")
     .addingQueryItem(name: "lon", value: -12.9123001299, digits: 5)
     .addingQueryItem(name: "appid", value: "apiKey")
     .addingQueryItem(name: "units", value: "metric")
-    .build()
+    .build() // or .buildThrowing()
 ```
 
 Anything that conforms to `QueryStringConvertible` can be used directly with the builder. Many `Foundation` types already conform to it.
