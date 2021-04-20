@@ -1,6 +1,6 @@
 import Foundation
 
-public enum NetworkRequestMethod: String {
+public enum NetworkRequestMethod: String, Codable, CaseIterable, Identifiable {
 
 	case get = "GET"
 	case post = "POST"
@@ -11,5 +11,9 @@ public enum NetworkRequestMethod: String {
 	case options = "OPTIONS"
 	case trace = "TRACE"
 	case patch = "PATCH"
+
+	public var id: String {
+		rawValue
+	}
 
 }
