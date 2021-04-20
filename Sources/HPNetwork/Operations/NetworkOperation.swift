@@ -9,8 +9,11 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 
 	let request: R
 	let progressHandler: ProgressHandler?
-	var networkCompletionBlock: R.Completion?
+	var networkCompletionBlockWithElapsedTime: R.CompletionWithElapsedTime?
 	let networkTask = NetworkTask()
+	var startTime: DispatchTime?
+	var networkingEndTime: DispatchTime?
+	var processingEndTime: DispatchTime?
 
 	private var data: Data?
 	private var response: URLResponse?
@@ -25,7 +28,9 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		super.main()
 
 		executeNetworkRequest()
+		networkingEndTime = DispatchTime.now()
 		let result = request.dataTaskResult(data: data, response: response, error: error)
+		processingEndTime = DispatchTime.now()
 		finish(with: result)
 	}
 
@@ -75,6 +80,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		}
 
 		networkTask.set(task)
+		startTime = DispatchTime.now()
 		task.resume()
 		semaphore.wait()
 		observation?.invalidate()
@@ -86,9 +92,26 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 
 	private func finish(with result: R.RequestResult) {
 		request.finishingQueue.sync {
-			networkCompletionBlock?(result)
-			networkCompletionBlock = nil
+			let elapsedTime = calculateElapsedTime() ?? (-1, -1)
+			networkCompletionBlockWithElapsedTime?(result, elapsedTime.0, elapsedTime.1)
+			networkCompletionBlockWithElapsedTime = nil
 		}
+	}
+
+	private func calculateElapsedTime() -> (TimeInterval, TimeInterval)? {
+		guard
+			let startTime = startTime,
+			let networkingEndTime = networkingEndTime,
+			let processingEndTime = processingEndTime
+		else {
+			return nil
+		}
+
+		let networkingTime = Double(networkingEndTime.uptimeNanoseconds - startTime.uptimeNanoseconds)
+		let processingTime = Double(processingEndTime.uptimeNanoseconds - networkingEndTime.uptimeNanoseconds)
+
+		// converting nanoseconds to seconds
+		return (networkingTime / 1e9, processingTime / 1e9)
 	}
 
 }

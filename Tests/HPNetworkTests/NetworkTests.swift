@@ -20,12 +20,25 @@ class NetworkTests: XCTestCase {
         wait(for: [expectation], timeout: 20)
     }
 
+	func testSimpleRequestWithElapsedTime() {
+		let expectation = XCTestExpectation(description: "fetched from server")
+
+		let request = BasicDecodableRequest<Int>(url: URL(string: "https://ipapi.co/json"))
+
+		Network.shared.scheduleIncludingElapsedTime(request: request) { result, networkingTime, processingTime in
+			print(networkingTime, processingTime)
+			expectation.fulfill()
+		}
+
+		wait(for: [expectation], timeout: 20)
+	}
+
 	func testConcurrentOperations() {
 		let expectation = XCTestExpectation(description: "fetched request from server")
 		expectation.expectedFulfillmentCount = 20
 
 		for _ in 0...20 {
-			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
+			let request = BasicRequest(url: URL(string: "https://panhans.dev"), finishingQueue: .main)
 
 			request.schedule { _ in
 				expectation.fulfill()
@@ -45,7 +58,7 @@ class NetworkTests: XCTestCase {
 		var finishedRequests = [Int]()
 
 		for i in 0...20 {
-			let request = BasicRequest(url: URL(string: "https://panhans.dev"))
+			let request = BasicRequest(url: URL(string: "https://panhans.dev"), finishingQueue: .main)
 
 			network.schedule(request: request) { result in
 				finishedRequests.append(i)
@@ -63,13 +76,27 @@ class NetworkTests: XCTestCase {
 
 		let expectation = XCTestExpectation(description: "fetched request from server")
 
-		let request = BasicRequest(url: URL(string: "https://panhans.dev/resources/random_data_10_mb"))
+		let request = BasicRequest(url: URL(string: "https://panhans.dev/resources/random_data_10_mb"), finishingQueue: .main)
 
-		network.schedule(request: request) { result in
+		network.scheduleIncludingElapsedTime(request: request) { result, networkingTime, processingTime in
+			print(networkingTime, processingTime)
 			expectation.fulfill()
 		}
 
 		wait(for: [expectation], timeout: 40)
+	}
+
+	func testNotMainThread() {
+		let expectation = XCTestExpectation(description: "fetched from server")
+
+		let request = BasicRequest(url: URL(string: "https://panhans.dev"), finishingQueue: .global())
+
+		Network.shared.schedule(request: request) { result in
+			XCTAssertFalse(Thread.current.isMainThread)
+			expectation.fulfill()
+		}
+
+		wait(for: [expectation], timeout: 20)
 	}
 
     #if canImport(UIKit)
@@ -186,7 +213,7 @@ class NetworkTests: XCTestCase {
 	}
 
 	func testSync() {
-		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+		let request = BasicRequest(url: URL(string: "https://panhans.dev"), finishingQueue: .main)
 		let result = Network.shared.scheduleSynchronously(request: request)
 		switch result {
 		case .success:
@@ -197,7 +224,7 @@ class NetworkTests: XCTestCase {
 	}
 
 	func testSync2() {
-		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+		let request = BasicRequest(url: URL(string: "https://panhans.dev"), finishingQueue: .global())
 		let result = request.scheduleSynchronously(on: .shared)
 		switch result {
 		case .success:
@@ -280,6 +307,7 @@ struct BasicRequest: NetworkRequest {
 
 	typealias Output = Data
 	let url: URL?
+	var finishingQueue: DispatchQueue
 	let requestMethod: NetworkRequestMethod = .get
 
 	func makeURL() throws -> URL {

@@ -34,29 +34,42 @@ public class Network {
 		self.init(queue: queue)
 	}
 
-	// MARK: - Requests
+	// MARK: - Asynchronous Requests
 
 	@discardableResult
 	public func schedule<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping T.Completion) -> NetworkTask {
-		let operation = NetworkOperation(request: request, progressHandler: progressHandler)
-		operation.networkCompletionBlock = completion
-		operationQueue.addOperation(operation)
-		return operation.networkTask
+		scheduleIncludingElapsedTime(request: request, progressHandler: progressHandler) { result, _, _ in
+			completion(result)
+		}
     }
 
+	@discardableResult
+	public func scheduleIncludingElapsedTime<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil, completion: @escaping T.CompletionWithElapsedTime) -> NetworkTask {
+		let operation = NetworkOperation(request: request, progressHandler: progressHandler)
+		operation.networkCompletionBlockWithElapsedTime = completion
+		operationQueue.addOperation(operation)
+		return operation.networkTask
+	}
+
+	// MARK: - Synchronous Requests
+
 	public func scheduleSynchronously<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil) -> T.RequestResult {
-		var result: T.RequestResult?
+		scheduleSynchronouslyInludingElapsedTime(request: request, progressHandler: progressHandler).0
+	}
+
+	public func scheduleSynchronouslyInludingElapsedTime<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil) -> T.RequestResultIncludingElapsedTime {
+		var resultIncludingElapsedTime: T.RequestResultIncludingElapsedTime?
 		let semaphore = RunLoopSemaphore(queue: request.finishingQueue)
 
-		schedule(request: request, progressHandler: progressHandler) { requestResult in
-			result = requestResult
+		scheduleIncludingElapsedTime(request: request, progressHandler: progressHandler) { requestResult, networkingTime, processingTime in
+			resultIncludingElapsedTime = (requestResult, networkingTime, processingTime)
 			semaphore.signal()
 		}
 
 		let dispatchTime = DispatchTime.now() + request.urlSession.configuration.timeoutIntervalForRequest
 		semaphore.wait(timeout: dispatchTime)
 
-		return result ?? .failure(NSError.unknown)
+		return resultIncludingElapsedTime ?? (.failure(NSError.unknown), 0, 0)
 	}
 
 }
