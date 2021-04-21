@@ -59,7 +59,7 @@ public class Network {
 
 	public func scheduleSynchronouslyInludingElapsedTime<T: NetworkRequest>(request: T, progressHandler: ProgressHandler? = nil) -> T.RequestResultIncludingElapsedTime {
 		var resultIncludingElapsedTime: T.RequestResultIncludingElapsedTime?
-		let semaphore = RunLoopSemaphore(queue: request.finishingQueue)
+		let semaphore: SemaphoreProtocol = request.finishingQueue == .main ? RunLoopSemaphore() : DispatchSemaphore(value: 0)
 
 		scheduleIncludingElapsedTime(request: request, progressHandler: progressHandler) { requestResult, networkingTime, processingTime in
 			resultIncludingElapsedTime = (requestResult, networkingTime, processingTime)

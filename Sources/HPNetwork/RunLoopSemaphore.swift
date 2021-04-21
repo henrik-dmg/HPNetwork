@@ -1,37 +1,46 @@
 import Foundation
 
-class RunLoopSemaphore {
+protocol SemaphoreProtocol {
 
-	private let queue: DispatchQueue
+	@discardableResult
+	func wait(timeout: DispatchTime) -> DispatchTimeoutResult
+
+	@discardableResult
+	func signal() -> Int
+
+}
+
+extension DispatchSemaphore: SemaphoreProtocol {}
+
+class RunLoopSemaphore: SemaphoreProtocol {
+
 	private var isRunLoopNested = false
 	private var isOperationCompleted = false
 
-	init(queue: DispatchQueue) {
-		self.queue = queue
-	}
-
-	func signal() {
+	@discardableResult
+	func signal() -> Int {
 		guard !isOperationCompleted else {
-			return
+			return 0
 		}
 		isOperationCompleted = true
 
 		if isRunLoopNested {
 			CFRunLoopStop(CFRunLoopGetCurrent())
 		}
+		return 1
 	}
 
-	func wait(timeout: DispatchTime? = nil) {
-		if let timeout = timeout {
-			queue.asyncAfter(deadline: timeout) { [weak self] in
-				self?.signal()
-			}
+	func wait(timeout: DispatchTime) -> DispatchTimeoutResult {
+		DispatchQueue.main.asyncAfter(deadline: timeout) { [weak self] in
+			self?.signal()
 		}
 		if !isOperationCompleted {
 			isRunLoopNested = true
 			CFRunLoopRun()
 			isRunLoopNested = false
 		}
+
+		return .success
 	}
 
 }
