@@ -5,8 +5,13 @@ public struct NetworkRequestHeaderField {
 	let name: String
 	let value: String
 
+	public static let contentTypeJSON = NetworkRequestHeaderField(name: "Content-Type", value: "application/json")
+	public static let acceptJSON = NetworkRequestHeaderField(name: "Accept", value: "application/json")
+	public static let acceptCharsetUTF8 = NetworkRequestHeaderField(name: "Accept-Charset", value: "utf-8")
+
+	@available(*, deprecated, renamed: "contentTypeJSON")
 	public static var json: NetworkRequestHeaderField {
-		NetworkRequestHeaderField(name: "Content-Type", value: "application/json")
+		contentTypeJSON
 	}
 
 	public static func musicUserToken(_ userToken: String) -> NetworkRequestHeaderField {

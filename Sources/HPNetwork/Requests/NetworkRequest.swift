@@ -29,6 +29,7 @@ public protocol NetworkRequest {
 	var finishingQueue: DispatchQueue { get }
 	var httpBody: Data? { get }
 	var urlSession: URLSession { get }
+
 	var headerFields: [NetworkRequestHeaderField]? { get }
 	/// The request method that will be used
 	var requestMethod: NetworkRequestMethod { get }
