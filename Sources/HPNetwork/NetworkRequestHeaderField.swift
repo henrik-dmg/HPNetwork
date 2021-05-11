@@ -2,8 +2,8 @@ import Foundation
 
 public struct NetworkRequestHeaderField {
 
-	let name: String
-	let value: String
+	public let name: String
+	public let value: String
 
 	public static let contentTypeJSON = NetworkRequestHeaderField(name: "Content-Type", value: "application/json")
 	public static let acceptJSON = NetworkRequestHeaderField(name: "Accept", value: "application/json")
