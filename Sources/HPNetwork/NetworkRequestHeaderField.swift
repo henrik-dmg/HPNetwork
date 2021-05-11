@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NetworkRequestHeaderField {
+public struct NetworkRequestHeaderField: Codable, Hashable, Equatable {
 
 	public let name: String
 	public let value: String
