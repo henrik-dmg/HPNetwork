@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol DecodableRequest: NetworkRequest where Output: Decodable {
+public protocol DecodableRequest: DataRequest where Output: Decodable {
 
 	var decoder: JSONDecoder { get }
 
@@ -12,7 +12,7 @@ extension DecodableRequest {
 
 	public var injectJSONOnError: Bool { true }
 
-	public func convertResponse(response: NetworkResponse) throws -> Output {
+	public func convertResponse(response: DataResponse) throws -> Output {
 		do {
 			return try decoder.decode(Output.self, from: response.data)
 		} catch let error as NSError {

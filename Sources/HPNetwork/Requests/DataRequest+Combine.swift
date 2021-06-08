@@ -3,7 +3,7 @@ import Foundation
 import Combine
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public extension NetworkRequest {
+public extension DataRequest {
 
 	func dataTaskPublisher() -> AnyPublisher<Output, Error> {
 		do {
@@ -24,7 +24,7 @@ public extension NetworkRequest {
 					let convertedError = convertError(error, data: data, response: response)
 					throw convertedError
 				}
-				return NetworkResponse(data: data, urlResponse: response)
+				return DataResponse(data: data, urlResponse: response)
 			}
 			.tryMap(convertResponse)
 			.eraseToAnyPublisher()

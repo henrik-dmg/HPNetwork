@@ -37,9 +37,6 @@ public protocol NetworkRequest {
 
 	func makeURL() throws -> URL
 
-	func convertResponse(response: NetworkResponse) throws -> Output
-	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error
-
 }
 
 extension NetworkRequest {
@@ -77,28 +74,5 @@ public extension NetworkRequest {
 	var headerFields: [NetworkRequestHeaderField]? { nil }
 
 	var authentication: NetworkRequestAuthentication? { nil }
-
-	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
-		error
-	}
-
-	@discardableResult
-	func schedule(on network: Network = .shared, progressHandler: ProgressHandler? = nil, completion: @escaping Completion) -> NetworkTask {
-		network.schedule(request: self, progressHandler: progressHandler, completion: completion)
-	}
-
-	func scheduleSynchronously(on network: Network = .shared, progressHandler: ProgressHandler? = nil) -> RequestResult {
-		network.scheduleSynchronously(request: self, progressHandler: progressHandler)
-	}
-
-}
-
-// MARK: - Raw Data
-
-public extension NetworkRequest where Output == Data {
-
-	func convertResponse(response: NetworkResponse) throws -> Output {
-		response.data
-	}
 
 }

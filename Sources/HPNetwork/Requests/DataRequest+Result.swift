@@ -1,6 +1,6 @@
 import Foundation
 
-extension NetworkRequest {
+extension DataRequest {
 
 	func dataTaskResult(data: Data?, response: URLResponse?, error: Error?) -> Result<Output, Error> {
 		let result: Result<Output, Error>
@@ -12,7 +12,7 @@ extension NetworkRequest {
 			result = .failure(convertedError)
 		} else if let data = data, let response = response {
 			do {
-				let response = NetworkResponse(data: data, urlResponse: response)
+				let response = DataResponse(data: data, urlResponse: response)
 				let output = try convertResponse(response: response)
 				result = .success(output)
 			} catch let error {

@@ -240,7 +240,7 @@ class NetworkTests: XCTestCase {
 
 import UIKit
 
-struct BasicImageRequest: NetworkRequest {
+struct BasicImageRequest: DataRequest {
 
 	typealias Output = UIImage
 
@@ -260,14 +260,14 @@ struct BasicImageRequest: NetworkRequest {
 
 import AppKit
 
-struct BasicImageRequest: NetworkRequest {
+struct BasicImageRequest: DataRequest {
 
 	typealias Output = NSImage
 
 	let url: URL?
 	let requestMethod: NetworkRequestMethod
 
-	func convertResponse(response: NetworkResponse) throws -> NSImage {
+	func convertResponse(response: DataResponse) throws -> NSImage {
 		guard let image = NSImage(data: response.data) else {
 			throw NSError.imageError
 		}
@@ -303,7 +303,7 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 }
 
-struct BasicRequest: NetworkRequest {
+struct BasicRequest: DataRequest {
 
 	typealias Output = Data
 	let url: URL?
@@ -319,7 +319,7 @@ struct BasicRequest: NetworkRequest {
 
 }
 
-struct FaultyRequest: NetworkRequest {
+struct FaultyRequest: DataRequest {
 
 	typealias Output = Data
 

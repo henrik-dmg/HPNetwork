@@ -15,9 +15,8 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 	var networkingEndTime: DispatchTime?
 	var processingEndTime: DispatchTime?
 
-	private var data: Data?
-	private var response: URLResponse?
-	private var error: Error?
+	var response: URLResponse?
+	var error: Error?
 
 	init(request: R, progressHandler: ProgressHandler?) {
 		self.request = request
@@ -29,7 +28,7 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 
 		executeNetworkRequest()
 		networkingEndTime = DispatchTime.now()
-		let result = request.dataTaskResult(data: data, response: response, error: error)
+		let result = makeResult()
 		processingEndTime = DispatchTime.now()
 		finish(with: result)
 	}
@@ -46,7 +45,11 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		}
 	}
 
-	private func executeNetworkRequest() {
+	func makeResult() -> R.RequestResult {
+		fatalError("Implement in subclass")
+	}
+
+	func executeNetworkRequest() {
 		do {
 			let urlRequest = try request.makeURLRequest()
 			executeNetworkRequest(with: urlRequest)
@@ -55,42 +58,11 @@ class NetworkOperation<R: NetworkRequest>: Operation {
 		}
 	}
 
-	private func executeNetworkRequest(with urlRequest: URLRequest) {
-		#if os(iOS) || os(tvOS)
-		let backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
-		#endif
-
-		let semaphore = DispatchSemaphore(value: 0)
-
-		let task = request.urlSession.dataTask(with: urlRequest) { [weak self] data, response, error in
-			self?.data = data
-			self?.response = response
-			self?.error = error
-			semaphore.signal()
-		}
-
-		var observation: NSKeyValueObservation?
-		if #available(iOS 11.0, tvOS 11.0, macOS 10.13, watchOS 4.0, *), let handler = progressHandler {
-			let queue = request.finishingQueue
-			observation = task.progress.observe(\.fractionCompleted) { progress, _ in
-				queue.async {
-					handler(progress)
-				}
-			}
-		}
-
-		networkTask.set(task)
-		startTime = DispatchTime.now()
-		task.resume()
-		semaphore.wait()
-		observation?.invalidate()
-
-		#if os(iOS) || os(tvOS)
-		UIApplication.shared.endBackgroundTask(backgroundTask)
-		#endif
+	func executeNetworkRequest(with urlRequest: URLRequest) {
+		fatalError("Should be overridden in superclass")
 	}
 
-	private func finish(with result: R.RequestResult) {
+	func finish(with result: R.RequestResult) {
 		request.finishingQueue.sync {
 			let elapsedTime = calculateElapsedTime() ?? (-1, -1)
 			networkCompletionBlockWithElapsedTime?(result, elapsedTime.0, elapsedTime.1)

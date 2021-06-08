@@ -1,6 +1,6 @@
 import Foundation
 
-public class NetworkResponse {
+public struct DataResponse {
 
     public let data: Data
     public let urlResponse: URLResponse
