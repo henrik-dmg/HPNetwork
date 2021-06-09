@@ -26,6 +26,12 @@ public extension DataRequest {
 		network.scheduleSynchronously(request: self, progressHandler: progressHandler)
 	}
 
+	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+	@discardableResult
+	func schedule(on network: Network = .shared, delegate: URLSessionDataDelegate? = nil) async throws -> Network.Response<Output> {
+		try await network.schedule(request: self, delegate: delegate)
+	}
+
 }
 
 // MARK: - Raw Data
