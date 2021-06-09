@@ -5,9 +5,9 @@ public class Network {
 	// MARK: - Nested Types
 
 	public struct Response<T> {
-		let output: T
-		let networkingDuration: TimeInterval
-		let processingDuration: TimeInterval
+		public let output: T
+		public let networkingDuration: TimeInterval
+		public let processingDuration: TimeInterval
 	}
 
 	// MARK: - Properties
