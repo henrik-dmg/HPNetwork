@@ -2,34 +2,41 @@ import Foundation
 
 public protocol DataRequest: NetworkRequest {
 
-	func convertResponse(response: DataResponse) throws -> Output
-	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error
+	func convertResponse(data: Data, response: URLResponse) throws -> Output
+	func convertError(error: Error, data: Data, response: URLResponse) -> Error
 
 }
 
-public extension DataRequest  {
+extension DataRequest {
 
-	func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error {
-		error
+	func dataTaskResult(data: Data, response: URLResponse) throws -> Output {
+		if let error = response.urlError() {
+			throw convertError(error: error, data: data, response: response)
+		} else {
+			return try convertResponse(data: data, response: response)
+		}
 	}
 
 }
+
+// MARK: - Scheduling and Convenience
 
 public extension DataRequest {
 
-	@discardableResult
-	func schedule(on network: Network = .shared, progressHandler: ProgressHandler? = nil, completion: @escaping Completion) -> NetworkTask {
-		network.schedule(request: self, progressHandler: progressHandler, completion: completion)
-	}
-
-	func scheduleSynchronously(on network: Network = .shared, progressHandler: ProgressHandler? = nil) -> RequestResult {
-		network.scheduleSynchronously(request: self, progressHandler: progressHandler)
+	func convertError(_ error: Error, data: Data, response: URLResponse) -> Error {
+		error
 	}
 
 	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-	@discardableResult
-	func schedule(on network: Network = .shared, delegate: URLSessionDataDelegate? = nil) async throws -> Network.Response<Output> {
-		try await network.schedule(request: self, delegate: delegate)
+	@discardableResult func schedule(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
+		let urlRequest = try makeURLRequest()
+		let startTime = DispatchTime.now()
+		let result = try await urlSession.data(for: urlRequest, delegate: delegate)
+		let networkingEndTime = DispatchTime.now()
+		let convertedResult = try dataTaskResult(data: result.0, response: result.1)
+		let processingEndTime = DispatchTime.now()
+		let elapsedTime = calculateElapsedTime(startTime: startTime, networkingEndTime: networkingEndTime, processingEndTime: processingEndTime)
+		return NetworkResponse(output: convertedResult, networkingDuration: elapsedTime.0, processingDuration: elapsedTime.1)
 	}
 
 }
@@ -38,8 +45,8 @@ public extension DataRequest {
 
 public extension DataRequest where Output == Data {
 
-	func convertResponse(response: DataResponse) throws -> Output {
-		response.data
+	func convertResponse(data: Data, response: URLResponse) throws -> Output {
+		data
 	}
 
 }

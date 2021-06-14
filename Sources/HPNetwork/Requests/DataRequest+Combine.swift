@@ -18,13 +18,12 @@ public extension DataRequest {
 
 	private func dataTaskPublisher(with request: URLRequest) -> AnyPublisher<Output, Error> {
 		urlSession.dataTaskPublisher(for: request)
-			.receive(on: finishingQueue)
 			.tryMap { data, response in
 				if let error = response.urlError() {
 					let convertedError = convertError(error, data: data, response: response)
 					throw convertedError
 				}
-				return DataResponse(data: data, urlResponse: response)
+				return (data, response)
 			}
 			.tryMap(convertResponse)
 			.eraseToAnyPublisher()

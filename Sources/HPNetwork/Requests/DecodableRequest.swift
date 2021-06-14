@@ -10,14 +10,14 @@ public protocol DecodableRequest: DataRequest where Output: Decodable {
 
 extension DecodableRequest {
 
-	public var injectJSONOnError: Bool { true }
+	public var injectJSONOnError: Bool { false }
 
-	public func convertResponse(response: DataResponse) throws -> Output {
+	public func convertResponse(data: Data, response: URLResponse) throws -> Output {
 		do {
-			return try decoder.decode(Output.self, from: response.data)
+			return try decoder.decode(Output.self, from: data)
 		} catch let error as NSError {
 			if injectJSONOnError {
-				throw error.injectJSON(response.data)
+				throw error.injectJSON(data)
 			} else {
 				throw error
 			}
