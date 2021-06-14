@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "HPNetwork"
-  s.version      = "2.0.2"
+  s.version      = "3.0.0"
   s.summary      = "A lightweight but customisable networking stack written in Swift"
 
   s.homepage     = "https://panhans.dev/opensource/hpnetwork"
@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.tvos.framework = "UIKit"
   s.osx.framework = "AppKit"
 
-  s.swift_version = "5.1"
+  s.swift_version = "5.5"
   s.requires_arc = true
 
 end

@@ -1,9 +1,14 @@
 import Foundation
 
+/// A protocol that's used to handle network request where the downloaded data is converted into a `Decodable` type
 public protocol DecodableRequest: DataRequest where Output: Decodable {
 
+	/// The decoder used to decode the downloaded data
 	var decoder: JSONDecoder { get }
 
+	/// A boolean indicating whether the downloaded data should be added the error in case the decoding of the desired type fails
+	///
+	/// Defaults to false
 	var injectJSONOnError: Bool { get }
 
 }

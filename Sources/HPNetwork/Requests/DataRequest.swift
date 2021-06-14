@@ -1,9 +1,27 @@
 import Foundation
 
+/// A protocol that's used to handle regular network request where data is downloaded
 public protocol DataRequest: NetworkRequest {
 
+	/// Called by ``schedule(delegate:)`` once the networking has finished.
+	///
+	/// For more convenient handling of `Decodable` output types, use ``DecodableRequest``
+	/// - Parameters:
+	/// 	- data: The raw data returned by the networking
+	/// 	- response: The network response
+	/// - Returns: An instance of the specified output type
 	func convertResponse(data: Data, response: URLResponse) throws -> Output
-	func convertError(error: Error, data: Data, response: URLResponse) -> Error
+
+	/// Called by ``schedule(delegate:)`` if the networking has finished successfully but `response` indicates an error.
+	/// Can be used to simply log errors or inspect them otherwise
+	///
+	/// The default implementation of this simply forwards the passed in error
+	/// - Parameters:
+	/// 	- error: The error that occured based on `response`
+	///		- data: The raw data returned by the networking
+	///		- response: The network response
+	/// - Returns: The passed in or modified error
+	func convertError(error: URLError, data: Data, response: URLResponse) -> Error
 
 }
 
@@ -23,7 +41,7 @@ extension DataRequest {
 
 public extension DataRequest {
 
-	func convertError(_ error: Error, data: Data, response: URLResponse) -> Error {
+	func convertError(error: URLError, data: Data, response: URLResponse) -> Error {
 		error
 	}
 
@@ -45,6 +63,12 @@ public extension DataRequest {
 
 public extension DataRequest where Output == Data {
 
+	/// Called by ``schedule(delegate:)`` once the networking has finished.
+	///
+	/// - Parameters:
+	/// 	- data: The raw data returned by the networking
+	/// 	- response: The network response
+	/// - Returns: The raw data returned by the networking
 	func convertResponse(data: Data, response: URLResponse) throws -> Output {
 		data
 	}

@@ -3,7 +3,7 @@ import Foundation
 public protocol DownloadRequest: NetworkRequest where Output == URL {
 
 	func convertResponse(url: URL, response: URLResponse) throws -> Output
-	func convertError(error: Error, url: URL, response: URLResponse) -> Error
+	func convertError(error: URLError, url: URL, response: URLResponse) -> Error
 
 }
 
@@ -27,7 +27,7 @@ public extension DownloadRequest {
 		url
 	}
 
-	func convertError(error: Error, url: URL, response: URLResponse) -> Error {
+	func convertError(error: URLError, url: URL, response: URLResponse) -> Error {
 		error
 	}
 
