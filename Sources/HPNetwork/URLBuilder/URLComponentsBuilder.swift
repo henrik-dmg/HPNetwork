@@ -1,0 +1,39 @@
+import Foundation
+
+@resultBuilder public struct URLComponentsBuilder {
+
+	public static func buildBlock(_ components: URLBuildable...) -> [URLBuildable] {
+		components
+	}
+
+	public static func buildEither(first component: [URLBuildable]) -> [URLBuildable] {
+		component
+	}
+
+	public static func buildEither(second component: [URLBuildable]) -> [URLBuildable] {
+		component
+	}
+
+	public static func buildOptional(_ component: [URLBuildable?]) -> [URLBuildable] {
+		component.compactMap { $0 }
+	}
+
+}
+
+public extension URL {
+
+	static func build(@URLComponentsBuilder block: () -> [URLBuildable]) -> URL? {
+		var components = URLComponents()
+		let blocks = block()
+		blocks.forEach { $0.modifyURLComponents(&components) }
+		return components.url
+	}
+
+	static func buildThrowing(@URLComponentsBuilder block: () -> [URLBuildable]) throws -> URL {
+		guard let url = build(block: block) else {
+			throw NSError.urlBuilderFailed
+		}
+		return url
+	}
+
+}

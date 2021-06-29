@@ -11,6 +11,7 @@ public struct URLBuilder {
 
 	// MARK: - Init
 
+	@available(*, deprecated, message: "Use URLBuilder.build(_:) or URLBuilder.buildThrowing(_:) instead")
     public init(scheme: String = "https", host: String) {
         self.scheme = scheme
         self.host = host
@@ -24,6 +25,14 @@ public struct URLBuilder {
         self.path = path
         self.queryItems = queryItems
     }
+
+	public static func build(@URLComponentsBuilder block: () -> [URLBuildable]) -> URL? {
+		URL.build(block: block)
+	}
+
+	public static func buildThrowing(@URLComponentsBuilder block: () -> [URLBuildable]) -> URL? {
+		URL.buildThrowing(block: block)
+	}
 
 	// MARK: - Path Components
 
