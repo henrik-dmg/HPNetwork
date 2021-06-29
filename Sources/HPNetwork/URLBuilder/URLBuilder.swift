@@ -26,12 +26,12 @@ public struct URLBuilder {
         self.queryItems = queryItems
     }
 
-	public static func build(@URLComponentsBuilder block: () -> [URLBuildable]) -> URL? {
+	public static func build(@URLComponentsBuilder block: () -> [URLBuildable?]) -> URL? {
 		URL.build(block: block)
 	}
 
-	public static func buildThrowing(@URLComponentsBuilder block: () -> [URLBuildable]) -> URL? {
-		URL.buildThrowing(block: block)
+	public static func buildThrowing(@URLComponentsBuilder block: () -> [URLBuildable?]) throws -> URL {
+		try URL.buildThrowing(block: block)
 	}
 
 	// MARK: - Path Components

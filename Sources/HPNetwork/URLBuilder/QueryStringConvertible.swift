@@ -34,6 +34,7 @@ extension UInt16: QueryStringConvertible {}
 extension UInt8: QueryStringConvertible {}
 extension Double: QueryStringConvertible {}
 extension Float: QueryStringConvertible {}
+extension Float80: QueryStringConvertible {}
 
 extension CGFloat: QueryStringConvertible {
 
