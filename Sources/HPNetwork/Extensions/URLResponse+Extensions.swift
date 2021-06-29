@@ -1,6 +1,6 @@
 import Foundation
 
-extension URLResponse {
+public extension URLResponse {
 
 	func urlError() -> URLError? {
 		guard let httpResponse = self as? HTTPURLResponse else {
