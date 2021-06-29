@@ -45,9 +45,9 @@ public protocol NetworkRequest {
 
 }
 
-extension NetworkRequest {
+public extension NetworkRequest {
 
-	func makeURLRequest() throws -> URLRequest {
+	func urlRequest() throws -> URLRequest {
 		let url = try makeURL()
 
 		var request = URLRequest(url: url)
@@ -66,6 +66,10 @@ extension NetworkRequest {
 
 		return request
 	}
+
+}
+
+extension NetworkRequest {
 
 	func calculateElapsedTime(startTime: DispatchTime, networkingEndTime: DispatchTime, processingEndTime: DispatchTime) -> (TimeInterval, TimeInterval) {
 		let networkingTime = Double(networkingEndTime.uptimeNanoseconds - startTime.uptimeNanoseconds)

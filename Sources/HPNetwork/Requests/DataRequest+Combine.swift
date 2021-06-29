@@ -7,7 +7,7 @@ public extension DataRequest {
 
 	func dataTaskPublisher() -> AnyPublisher<Output, Error> {
 		do {
-			let request = try makeURLRequest()
+			let request = try urlRequest()
 			return dataTaskPublisher(with: request)
 		} catch let error {
 			return Future<Output, Error> { completion in

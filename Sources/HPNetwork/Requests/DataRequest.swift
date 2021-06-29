@@ -47,7 +47,7 @@ public extension DataRequest {
 
 	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 	@discardableResult func schedule(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
-		let urlRequest = try makeURLRequest()
+		let urlRequest = try urlRequest()
 		let startTime = DispatchTime.now()
 		let result = try await urlSession.data(for: urlRequest, delegate: delegate)
 		let networkingEndTime = DispatchTime.now()
