@@ -6,16 +6,24 @@ import Foundation
 		components
 	}
 
-	public static func buildEither(first component: [URLBuildable?]) -> [URLBuildable?] {
-		component
+	public static func buildEither(first component: [URLBuildable?]?) -> [URLBuildable?] {
+		component ?? []
 	}
 
-	public static func buildEither(second component: [URLBuildable?]) -> [URLBuildable?] {
-		component
+	public static func buildEither(second component: [URLBuildable?]?) -> [URLBuildable?] {
+		component ?? []
 	}
 
-	public static func buildOptional(_ component: [URLBuildable?]) -> [URLBuildable?] {
-		component
+	public static func buildOptional(_ component: [URLBuildable?]?) -> [URLBuildable?] {
+		component ?? []
+	}
+
+	public static func buildArray(_ components: [[URLBuildable?]]) -> [URLBuildable?] {
+		components.reduce([URLBuildable?]()) { partialResult, array in
+			var new = partialResult
+			new.append(contentsOf: array)
+			return new
+		}
 	}
 
 }
