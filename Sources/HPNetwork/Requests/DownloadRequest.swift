@@ -43,4 +43,14 @@ public extension DownloadRequest {
 		return NetworkResponse(output: convertedResult, networkingDuration: elapsedTime.0, processingDuration: elapsedTime.1)
 	}
 
+	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+	@discardableResult func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
+		do {
+			let result = try await response(delegate: delegate)
+			return .success(result)
+		} catch {
+			return .failure(error)
+		}
+	}
+
 }
