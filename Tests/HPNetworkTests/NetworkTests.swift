@@ -14,13 +14,25 @@ class NetworkTests: XCTestCase {
 		await HPAssertNoThrow(try await request.response())
     }
 
+	func testSimpleRequestCompletionHandler() async {
+		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+
+		let expectiona = XCTestExpectation(description: "Networking finished")
+
+		request.schedule { result in
+			expectiona.fulfill()
+		}
+
+		wait(for: [expectiona], timeout: 10)
+	}
+
     #if canImport(UIKit)
 	func testImageDownload() async throws {
         let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
         let url = URL(string: avatarURLString)
 		let request = BasicImageRequest(url: url, requestMethod: .get)
 
-		let response = try await request.schedule()
+		let response = try await request.response()
 		print(response.output.size)
     }
     #endif
