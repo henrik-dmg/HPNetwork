@@ -54,8 +54,8 @@ public extension DownloadRequest {
 	}
 
 	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-	@discardableResult func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<(), Never> {
-		Task {
+	func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) {
+		async {
 			let result = await result(delegate: delegate)
 			DispatchQueue.main.async {
 				completion(result)
