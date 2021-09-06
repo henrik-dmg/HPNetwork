@@ -135,21 +135,7 @@ By default, instances of `NetworkRequest` will simply forward any encountered er
 
 ### URLBuilder
 
-There's a type available that you can use to construct `URL` instances. To use it, initialise `URLBuilder` with a host: `URLBuilder(host: "apple.com")`. You can then add path components and query items in a type-safe way and `URLBuilder` will automatically take care of formatting and encoding.
-
-```swift
-URLBuilder(host: "api.openweathermap.org")
-    .addingPathComponent("data")
-    .addingPathComponent("2.5")
-    .addingPathComponent("onecall")
-    .addingQueryItem(name: "lat", value: 48.123123012, digits: 5)
-    .addingQueryItem(name: "lon", value: -12.9123001299, digits: 5)
-    .addingQueryItem(name: "appid", value: "apiKey")
-    .addingQueryItem(name: "units", value: "metric")
-    .build() // or .buildThrowing()
-```
-
-Anything that conforms to `QueryStringConvertible` can be used directly with the builder. Many `Foundation` types already conform to it.
+`URLBuilder` has been broken out into a separate package `HPURLBuilder` that can be found [here](https://github.com/henrik-dmg/HPURLBuilder)
 
 ### Request Authentication
 
