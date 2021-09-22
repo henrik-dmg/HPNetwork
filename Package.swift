@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "HPNetwork",
     platforms: [
-        .iOS(.v9), .macOS(.v10_11), .tvOS(.v9), .watchOS(.v3)
+        .iOS(.v15), .tvOS(.v15), .watchOS(.v8) // .macOS(.v12)
     ],
     products: [
         .library(name: "HPNetwork", targets: ["HPNetwork"]),
