@@ -8,9 +8,7 @@
 
 ### SPM
 
-Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork/tree/feature/async", from: "2.0.0")` to your `Package.swift`
-
-If you're looking for a version of the package that uses the new concurrency features in Swift 5.5, use the branch `feature/async`
+Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork/tree/feature/async", from: "3.0.0")` to your `Package.swift`
 
 ### CocoaPods
 
