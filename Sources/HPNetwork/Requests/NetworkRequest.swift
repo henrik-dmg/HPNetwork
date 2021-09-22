@@ -2,61 +2,81 @@ import Foundation
 
 // MARK: - NetworkRequest
 
+/// A base protocol to define network requests
 public protocol NetworkRequest {
 
 	/// The expected output type returned in the network request
 	associatedtype Output
 
-	/// A result containing either the specified output type or an error
-	typealias RequestResult = Result<Output, Error>
-
-	/// A result containing either the specified output type or an error
-	typealias RequestResultIncludingElapsedTime = (Result<Output, Error>, TimeInterval, TimeInterval)
-
-	/// A callback which includes the result of the networking operation
-	/// - Parameters:
-	///   - result: A result containing either the specified output type or an error
-	typealias Completion = (_ result: RequestResult) -> Void
-
-	/// A callback which includes the result of the networking operation and elapsed times. The first `TimeInterval` is the seconds which
-	/// the networking itself took and the second is the processing time in seconds
-	/// - Parameters:
-	///   - result: A result containing either the specified output type or an error
-	///   - networkingTime: the time in seconds which the networking itself took
-	///   - processingTime: the time in seconds which the processing took
-	typealias CompletionWithElapsedTime = (_ result: RequestResult, _ networkingTime: TimeInterval, _ processingTime: TimeInterval) -> Void
-
-	var finishingQueue: DispatchQueue { get }
+	/// The data that will be send in the HTTP body of the request
+	///
+	/// Defaults to `nil`
 	var httpBody: Data? { get }
+
+	/// The `URLSession` that will be used to schedule the network request
+	///
+	/// Defaults to `URLSession.shared`
 	var urlSession: URLSession { get }
 
-	var headerFields: [NetworkRequestHeaderField]? { get }
+	/// The header fields that will be send with the network request
+	///
+	/// Defaults to an empty array
+	var headerFields: [NetworkRequestHeaderField] { get }
+
 	/// The request method that will be used
 	var requestMethod: NetworkRequestMethod { get }
+
+	/// The authentication method used to authenticate the network request
+	///
+	/// An appropriate instance of ``NetworkRequestHeaderField`` will be created from this and appended to the other provided header fields. Defaults to `nil`
 	var authentication: NetworkRequestAuthentication? { get }
 
+	/// A method used to construct or create the URL of the network request
+	///
+	/// This method is the very first call when calling ``schedule(delegate:)``
 	func makeURL() throws -> URL
+
+	/// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
+	/// - Parameters:
+	/// 	- delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+	/// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
+	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+	func response(delegate: URLSessionDataDelegate?) async throws -> NetworkResponse<Output>
 
 }
 
-extension NetworkRequest {
+public extension NetworkRequest {
 
-	func makeURLRequest() throws -> URLRequest {
+	func urlRequest() throws -> URLRequest {
 		let url = try makeURL()
 
 		var request = URLRequest(url: url)
 		request.httpMethod = requestMethod.rawValue
 		request.httpBody = httpBody
+		headerFields.forEach {
+			request.addHeaderField($0)
+		}
+
 		if let auth = authentication {
 			guard let field = auth.headerField else {
 				throw NSError.failedToCreateRequest.withFailureReason("Could not create authorisation header field: \(auth)")
 			}
 			request.addHeaderField(field)
 		}
-		headerFields?.forEach {
-			request.addHeaderField($0)
-		}
+
 		return request
+	}
+
+}
+
+extension NetworkRequest {
+
+	func calculateElapsedTime(startTime: DispatchTime, networkingEndTime: DispatchTime, processingEndTime: DispatchTime) -> (TimeInterval, TimeInterval) {
+		let networkingTime = Double(networkingEndTime.uptimeNanoseconds - startTime.uptimeNanoseconds)
+		let processingTime = Double(processingEndTime.uptimeNanoseconds - networkingEndTime.uptimeNanoseconds)
+
+		// converting nanoseconds to seconds
+		return (networkingTime / 1e9, processingTime / 1e9)
 	}
 
 }
@@ -65,13 +85,11 @@ extension NetworkRequest {
 
 public extension NetworkRequest {
 
-	var finishingQueue: DispatchQueue { .main }
-
 	var httpBody: Data? { nil }
 
 	var urlSession: URLSession { .shared }
 
-	var headerFields: [NetworkRequestHeaderField]? { nil }
+	var headerFields: [NetworkRequestHeaderField] { [] }
 
 	var authentication: NetworkRequestAuthentication? { nil }
 

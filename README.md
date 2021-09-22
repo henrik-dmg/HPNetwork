@@ -18,52 +18,19 @@ Add `pod 'HPNetwork'` to your Podfile and run `pod install`
 
 ## Posting Request
 
-To submit a request, you can use the singleton:
+Scheduling a request is as easy as this:
 
 ```swift
-Network.shared.schedule(request) { result in
-    switch result {
-    case .success(let output):
-        // handle result
-    case .failure(let error):
-        // handle error
-    }
-}
+let response = try await request.response()
 ```
 
-of with the convenience method:
+The `response` is a `NetworkResponse<Output>` containing the output and statisticsof the request.
 
-```swift
-request.schedule { result in
-	// Handle result
-}
-```
-
-The `result` is `Result<Request.Output, Error>` where `Request.Output` is inferred from the request object.
-`Network.shared` will do its networking on “com.henrikpanhans.Network” (which is a concurrent queue). If you want to use a custom queue, you can pass it in the initialiser:
-
-```swift
-let customQueue = DispatchQueue(label: "com.henrikpanhans.CustomQueue", qos: .userInitiated, attributes: .concurrent)
-let network = Network(queue: customQueue)
-```
-
-You can limit the maximum number of concurrent requests to be executed by setting `Network.shared.maximumConcurrentRequests = 5` for example
+````
 
 ### Combine
 
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the regular `Network`.
-
-### Progress Callback
-
-You can pass a progress handler block to `Network` like this:
-
-```swift
-Network.shared.schedule(request: request) { progress in
-    print(progress.fractionComplete)
-} completion: { result in
-    // Result handling as usual
-}
-```
+You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the `response()` method.
 
 ### Synchronous Requests
 
@@ -82,7 +49,7 @@ HPNetwork is following a rather protocol based approach, so any type that confor
 #### Example 1:
 
 ```swift
-struct BasicDataRequest: NetworkRequest {
+struct BasicDataRequest: DataRequest {
 
     typealias Output = Data
 
@@ -100,7 +67,7 @@ struct BasicDataRequest: NetworkRequest {
 ### Example 2:
 
 ```swift
-struct BasicDataRequest: NetworkRequest {
+struct BasicDataRequest: DataRequest {
 
     typealias Output = Data
 
@@ -147,21 +114,7 @@ By default, instances of `NetworkRequest` will simply forward any encountered er
 
 ### URLBuilder
 
-There's a type available that you can use to construct `URL` instances. To use it, initialise `URLBuilder` with a host: `URLBuilder(host: "apple.com")`. You can then add path components and query items in a type-safe way and `URLBuilder` will automatically take care of formatting and encoding.
-
-```swift
-URLBuilder(host: "api.openweathermap.org")
-    .addingPathComponent("data")
-    .addingPathComponent("2.5")
-    .addingPathComponent("onecall")
-    .addingQueryItem(name: "lat", value: 48.123123012, digits: 5)
-    .addingQueryItem(name: "lon", value: -12.9123001299, digits: 5)
-    .addingQueryItem(name: "appid", value: "apiKey")
-    .addingQueryItem(name: "units", value: "metric")
-    .build() // or .buildThrowing()
-```
-
-Anything that conforms to `QueryStringConvertible` can be used directly with the builder. Many `Foundation` types already conform to it.
+`URLBuilder` has been broken out into a separate package `HPURLBuilder` that can be found [here](https://github.com/henrik-dmg/HPURLBuilder)
 
 ### Request Authentication
 
@@ -176,5 +129,6 @@ Things like `httpBody: Data?` and `headerFields: [NetworkRequestHeaderField]` sh
 - [x] Cancellation support
 - [x] Progress callback
 - [x] Improving the documentation
-- [ ] Add `async` variants for the new Swift version
+- [x] Add `async` variants for the new Swift version
 - [ ] Cookie support
+````

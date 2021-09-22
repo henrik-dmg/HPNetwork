@@ -70,7 +70,7 @@ public final class ConnectionMonitor {
 
     // MARK: - Notifications
 
-    public func startMonitoring(on queue: DispatchQueue = .init(label: "com.henrikpanhans.ConnectionMonitor", qos: .background)) {
+    public func startMonitoring(on queue: DispatchQueue = .init(label: "dev.panhans.ConnectionMonitor", qos: .background)) {
         pathMonitor.start(queue: queue)
         isMonitoring = true
     }
