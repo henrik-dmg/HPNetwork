@@ -24,8 +24,6 @@ let response = try await request.response()
 
 The `response` is a `NetworkResponse<Output>` containing the output and statisticsof the request.
 
-````
-
 ### Combine
 
 You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the `response()` method.
