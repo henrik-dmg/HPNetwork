@@ -68,7 +68,7 @@ public extension DataRequest {
 	}
 
 	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
-	func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<(), Never> {
+	@discardableResult func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<(), Never> {
 		Task {
 			let result = await result(delegate: delegate)
 			DispatchQueue.main.async {

@@ -1,5 +1,7 @@
 # HPNetwork
 
+![HPNetwork](/Assets/Banner.png)
+
 ![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
 
 `HPNetwork` is a protocol-based networking stack written in pure Swift
@@ -116,9 +118,9 @@ By default, instances of `NetworkRequest` will simply forward any encountered er
 
 To add authentication to a request, simply supply a `authentication: NetworkRequestAuthentication?` instance to your request. `NetworkRequestAuthentication` is an enum and supports basic authentication with a username and password, bearer token authorisation or a raw option if you want full control.
 
-### Everything else
+### Authors
 
-Things like `httpBody: Data?` and `headerFields: [NetworkRequestHeaderField]` should be pretty self-explanatory so I'm gonna let you figure those out on your own.
+- Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
 
 ## WIP
 
@@ -127,4 +129,3 @@ Things like `httpBody: Data?` and `headerFields: [NetworkRequestHeaderField]` sh
 - [x] Improving the documentation
 - [x] Add `async` variants for the new Swift version
 - [ ] Cookie support
-````
