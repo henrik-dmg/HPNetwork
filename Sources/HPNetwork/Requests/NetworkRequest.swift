@@ -47,6 +47,8 @@ public protocol NetworkRequest {
 
 public extension NetworkRequest {
 
+    /// Constructs a `URLRequest` from the provided values
+    /// - Returns: a new `URLRequest` instance
 	func urlRequest() throws -> URLRequest {
 		let url = try makeURL()
 
