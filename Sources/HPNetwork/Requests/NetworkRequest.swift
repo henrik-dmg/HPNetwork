@@ -40,7 +40,6 @@ public protocol NetworkRequest {
 	/// - Parameters:
 	/// 	- delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
 	/// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
-	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 	func response(delegate: URLSessionDataDelegate?) async throws -> NetworkResponse<Output>
 
 }

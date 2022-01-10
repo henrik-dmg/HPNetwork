@@ -31,11 +31,10 @@ public extension DownloadRequest {
 		error
 	}
 
-	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 	@discardableResult func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
 		let urlRequest = try urlRequest()
 		let startTime = DispatchTime.now()
-		let result = try await urlSession.download(for: urlRequest, delegate: delegate)
+		let result = try await urlSession.hp_download(for: urlRequest, delegate: delegate)
 		let networkingEndTime = DispatchTime.now()
 		let convertedResult = try downloadTaskResult(url: result.0, response: result.1)
 		let processingEndTime = DispatchTime.now()
@@ -43,7 +42,6 @@ public extension DownloadRequest {
         return NetworkResponse(output: convertedResult, response: result.1, networkingDuration: elapsedTime.0, processingDuration: elapsedTime.1)
 	}
 
-	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 	@discardableResult func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
 		do {
 			let result = try await response(delegate: delegate)
@@ -53,7 +51,6 @@ public extension DownloadRequest {
 		}
 	}
 
-	@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 	func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<(), Never> {
 		Task {
 			let result = await result(delegate: delegate)
