@@ -6,10 +6,23 @@ import PackageDescription
 let package = Package(
     name: "HPNetwork",
     platforms: [
-        .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macOS(.v10_15)
+        .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macOS(.v10_15),
     ],
     products: [
-        .library(name: "HPNetwork", targets: ["HPNetwork"]),
+        .library(
+            name: "HPNetwork",
+            targets: ["HPNetwork"]
+        ),
+        .library(
+            name: "HPNetwork-Dynamic",
+            type: .dynamic,
+            targets: ["HPNetwork"]
+        ),
+        .library(
+            name: "HPNetwork-Static",
+            type: .static,
+            targets: ["HPNetwork"]
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -18,6 +31,6 @@ let package = Package(
         .testTarget(
             name: "HPNetworkTests",
             dependencies: ["HPNetwork"]
-		)
+        ),
     ]
 )

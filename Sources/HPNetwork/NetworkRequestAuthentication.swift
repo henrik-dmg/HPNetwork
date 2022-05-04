@@ -8,24 +8,24 @@ public enum NetworkRequestAuthentication {
 
     var headerString: String? {
         switch self {
-        case .basic(let username, let password):
+        case let .basic(username, password):
             let loginString = String(format: "%@:%@", username, password)
-			guard let loginDataString = loginString.data(using: .utf8)?.base64EncodedString() else {
-				return nil
-			}
+            guard let loginDataString = loginString.data(using: .utf8)?.base64EncodedString() else {
+                return nil
+            }
             return "Basic \(loginDataString)"
-        case .raw(let string):
+        case let .raw(string):
             return string
-        case .bearer(let token):
+        case let .bearer(token):
             return "Bearer \(token)"
         }
     }
 
-	var headerField: NetworkRequestHeaderField? {
-		guard let headerString = headerString else {
-			return nil
-		}
-		return NetworkRequestHeaderField(name: "Authorization", value: headerString)
-	}
+    var headerField: NetworkRequestHeaderField? {
+        guard let headerString = headerString else {
+            return nil
+        }
+        return NetworkRequestHeaderField(name: "Authorization", value: headerString)
+    }
 
 }

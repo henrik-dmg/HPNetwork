@@ -1,9 +1,9 @@
 @testable import HPNetwork
 import XCTest
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #elseif canImport(AppKit)
-import AppKit
+    import AppKit
 #endif
 
 @available(iOS 15.0, macOS 12.0, *)
@@ -11,190 +11,190 @@ class NetworkTests: XCTestCase {
 
     func testSimpleRequest() async {
         let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
-		await HPAssertNoThrow(try await request.response())
+        await HPAssertNoThrow(try await request.response())
     }
 
-	func testSimpleRequestCompletionHandler() async {
-		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+    func testSimpleRequestCompletionHandler() async {
+        let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
 
-		let expectiona = XCTestExpectation(description: "Networking finished")
+        let expectiona = XCTestExpectation(description: "Networking finished")
 
-		request.schedule { result in
-			expectiona.fulfill()
-		}
+        request.schedule { _ in
+            expectiona.fulfill()
+        }
 
-		wait(for: [expectiona], timeout: 10)
-	}
+        wait(for: [expectiona], timeout: 10)
+    }
 
     #if canImport(UIKit)
-	func testImageDownload() async throws {
-        let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
-        let url = URL(string: avatarURLString)
-		let request = BasicImageRequest(url: url, requestMethod: .get)
+        func testImageDownload() async throws {
+            let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
+            let url = URL(string: avatarURLString)
+            let request = BasicImageRequest(url: url, requestMethod: .get)
 
-		let response = try await request.response()
-		print(response.output.size)
-    }
+            let response = try await request.response()
+            print(response.output.size)
+        }
     #endif
 
     #if canImport(AppKit)
-    func testImageDownload() async throws {
-		let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
-		let url = URL(string: avatarURLString)
-		let request = BasicImageRequest(url: url, requestMethod: .get)
+        func testImageDownload() async throws {
+            let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
+            let url = URL(string: avatarURLString)
+            let request = BasicImageRequest(url: url, requestMethod: .get)
 
-		let response = try await request.response()
-		print(response.output.size)
-    }
+            let response = try await request.response()
+            print(response.output.size)
+        }
     #endif
 
-	func testPublisher() {
-		let expectationFinished = expectation(description: "finished")
-		let expectationReceive = expectation(description: "receiveValue")
+    func testPublisher() {
+        let expectationFinished = expectation(description: "finished")
+        let expectationReceive = expectation(description: "receiveValue")
 
-		let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
+        let request = BasicDecodableRequest<EmptyStruct>(url: URL(string: "https://ipapi.co/json"))
 
-		let cancellable = request.dataTaskPublisher().sink { result in
-			switch result {
-			case .failure(let error):
-				XCTFail(error.localizedDescription)
-			case .finished:
-				expectationFinished.fulfill()
-			}
-		} receiveValue: { response in
-			expectationReceive.fulfill()
-		}
+        let cancellable = request.dataTaskPublisher().sink { result in
+            switch result {
+            case let .failure(error):
+                XCTFail(error.localizedDescription)
+            case .finished:
+                expectationFinished.fulfill()
+            }
+        } receiveValue: { _ in
+            expectationReceive.fulfill()
+        }
 
-		waitForExpectations(timeout: 10) { error in
-			cancellable.cancel()
-		}
-	}
+        waitForExpectations(timeout: 10) { _ in
+            cancellable.cancel()
+        }
+    }
 
-	func testPublisherFailure() {
-		let expectationFinished = expectation(description: "finished")
+    func testPublisherFailure() {
+        let expectationFinished = expectation(description: "finished")
 
-		let request = FaultyRequest()
+        let request = FaultyRequest()
 
-		let cancellable = request.dataTaskPublisher().sink { result in
-			switch result {
-			case .failure(let error as NSError):
-				XCTAssertEqual(error, NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil"))
-				expectationFinished.fulfill()
-			case .finished:
-				XCTFail("Networking should not be successful")
-			}
-		} receiveValue: { response in
-			//
-		}
+        let cancellable = request.dataTaskPublisher().sink { result in
+            switch result {
+            case let .failure(error as NSError):
+                XCTAssertEqual(error, NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil"))
+                expectationFinished.fulfill()
+            case .finished:
+                XCTFail("Networking should not be successful")
+            }
+        } receiveValue: { _ in
+            //
+        }
 
-		waitForExpectations(timeout: 10) { error in
-			cancellable.cancel()
-		}
-	}
+        waitForExpectations(timeout: 10) { _ in
+            cancellable.cancel()
+        }
+    }
 
 }
 
 #if canImport(UIKit)
 
-import UIKit
+    import UIKit
 
-struct BasicImageRequest: DataRequest {
+    struct BasicImageRequest: DataRequest {
 
-	typealias Output = UIImage
+        typealias Output = UIImage
 
-	let url: URL?
-	let requestMethod: NetworkRequestMethod
+        let url: URL?
+        let requestMethod: NetworkRequestMethod
 
-	func convertResponse(data: Data, response: URLResponse) throws -> UIImage {
-		guard let image = UIImage(data: data) else {
-			throw NSError.imageError
-		}
-		return image
-	}
+        func convertResponse(data: Data, response _: URLResponse) throws -> UIImage {
+            guard let image = UIImage(data: data) else {
+                throw NSError.imageError
+            }
+            return image
+        }
 
-	func makeURL() throws -> URL {
-		guard let url = url else {
-			throw NSError.failedToCreateRequest
-		}
-		return url
-	}
+        func makeURL() throws -> URL {
+            guard let url = url else {
+                throw NSError.failedToCreateRequest
+            }
+            return url
+        }
 
-}
+    }
 
 #elseif canImport(AppKit)
 
-import AppKit
+    import AppKit
 
-struct BasicImageRequest: DataRequest {
+    struct BasicImageRequest: DataRequest {
 
-	typealias Output = NSImage
+        typealias Output = NSImage
 
-	let url: URL?
-	let requestMethod: NetworkRequestMethod
+        let url: URL?
+        let requestMethod: NetworkRequestMethod
 
-	func convertResponse(data: Data, response: URLResponse) throws -> NSImage {
-		guard let image = NSImage(data: data) else {
-			throw NSError.imageError
-		}
-		return image
-	}
+        func convertResponse(data: Data, response _: URLResponse) throws -> NSImage {
+            guard let image = NSImage(data: data) else {
+                throw NSError.imageError
+            }
+            return image
+        }
 
-	func makeURL() throws -> URL {
-		guard let url = url else {
-			throw NSError.failedToCreateRequest
-		}
-		return url
-	}
+        func makeURL() throws -> URL {
+            guard let url = url else {
+                throw NSError.failedToCreateRequest
+            }
+            return url
+        }
 
-}
+    }
 
 #endif
 
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
-	let url: URL?
-	let requestMethod: NetworkRequestMethod = .get
+    let url: URL?
+    let requestMethod: NetworkRequestMethod = .get
 
-	var decoder: JSONDecoder {
-		JSONDecoder()
-	}
+    var decoder: JSONDecoder {
+        JSONDecoder()
+    }
 
-	func makeURL() throws -> URL {
-		guard let url = url else {
-			throw NSError.failedToCreateRequest
-		}
-		return url
-	}
+    func makeURL() throws -> URL {
+        guard let url = url else {
+            throw NSError.failedToCreateRequest
+        }
+        return url
+    }
 
 }
 
 struct BasicRequest: DataRequest {
 
-	typealias Output = Data
-	let url: URL?
-	var finishingQueue: DispatchQueue
-	let requestMethod: NetworkRequestMethod = .get
+    typealias Output = Data
+    let url: URL?
+    var finishingQueue: DispatchQueue
+    let requestMethod: NetworkRequestMethod = .get
 
-	func makeURL() throws -> URL {
-		guard let url = url else {
-			throw NSError.failedToCreateRequest
-		}
-		return url
-	}
+    func makeURL() throws -> URL {
+        guard let url = url else {
+            throw NSError.failedToCreateRequest
+        }
+        return url
+    }
 
 }
 
 struct FaultyRequest: DataRequest {
 
-	typealias Output = Data
+    typealias Output = Data
 
-	var requestMethod: NetworkRequestMethod {
-		.get
-	}
+    var requestMethod: NetworkRequestMethod {
+        .get
+    }
 
-	func makeURL() throws -> URL {
-		throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
-	}
+    func makeURL() throws -> URL {
+        throw NSError.failedToCreateRequest.withFailureReason("The URL instance to create the request is nil")
+    }
 
 }
 

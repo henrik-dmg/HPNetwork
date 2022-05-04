@@ -6,21 +6,21 @@ extension URLSession {
 
     func hp_data(for request: URLRequest, delegate: URLSessionTaskDelegate?) async throws -> (Data, URLResponse) {
         #if os(iOS)
-        if #available(iOS 15, *) {
-            return try await data(for: request, delegate: delegate)
-        }
+            if #available(iOS 15, *) {
+                return try await data(for: request, delegate: delegate)
+            }
         #elseif os(OSX)
-        if #available(macOS 12, *) {
-            return try await data(for: request, delegate: delegate)
-        }
+            if #available(macOS 12, *) {
+                return try await data(for: request, delegate: delegate)
+            }
         #elseif os(tvOS)
-        if #available(tvOS 15, *) {
-            return try await data(for: request, delegate: delegate)
-        }
+            if #available(tvOS 15, *) {
+                return try await data(for: request, delegate: delegate)
+            }
         #elseif os(watchOS)
-        if #available(watchOS 8, *) {
-            return try await data(for: request, delegate: delegate)
-        }
+            if #available(watchOS 8, *) {
+                return try await data(for: request, delegate: delegate)
+            }
         #endif
 
         return try await hp_dataContinuation(for: request)
@@ -43,21 +43,21 @@ extension URLSession {
 
     func hp_download(for request: URLRequest, delegate: URLSessionTaskDelegate?) async throws -> (URL, URLResponse) {
         #if os(iOS)
-        if #available(iOS 15, *) {
-            return try await download(for: request, delegate: delegate)
-        }
+            if #available(iOS 15, *) {
+                return try await download(for: request, delegate: delegate)
+            }
         #elseif os(OSX)
-        if #available(macOS 12, *) {
-            return try await download(for: request, delegate: delegate)
-        }
+            if #available(macOS 12, *) {
+                return try await download(for: request, delegate: delegate)
+            }
         #elseif os(tvOS)
-        if #available(tvOS 15, *) {
-            return try await download(for: request, delegate: delegate)
-        }
+            if #available(tvOS 15, *) {
+                return try await download(for: request, delegate: delegate)
+            }
         #elseif os(watchOS)
-        if #available(watchOS 8, *) {
-            return try await download(for: request, delegate: delegate)
-        }
+            if #available(watchOS 8, *) {
+                return try await download(for: request, delegate: delegate)
+            }
         #endif
 
         return try await hp_downloadContinuation(for: request)
