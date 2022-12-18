@@ -1,10 +1,5 @@
 @testable import HPNetwork
 import XCTest
-#if canImport(UIKit)
-import UIKit
-#elseif canImport(AppKit)
-import AppKit
-#endif
 
 @available(iOS 15.0, macOS 12.0, *)
 class NetworkTests: XCTestCase {
@@ -25,28 +20,6 @@ class NetworkTests: XCTestCase {
 
         wait(for: [expectiona], timeout: 10)
     }
-
-#if canImport(UIKit)
-    func testImageDownload() async throws {
-        let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
-        let url = URL(string: avatarURLString)
-        let request = BasicImageRequest(url: url, requestMethod: .get)
-
-        let response = try await request.response()
-        print(response.output.size)
-    }
-#endif
-
-#if canImport(AppKit)
-    func testImageDownload() async throws {
-        let avatarURLString = "https://panhans.dev/resources/Ugly-Separators.png"
-        let url = URL(string: avatarURLString)
-        let request = BasicImageRequest(url: url, requestMethod: .get)
-
-        let response = try await request.response()
-        print(response.output.size)
-    }
-#endif
 
     func testPublisher() {
         let expectationFinished = expectation(description: "finished")
@@ -93,62 +66,6 @@ class NetworkTests: XCTestCase {
     }
 
 }
-
-#if canImport(UIKit)
-
-import UIKit
-
-struct BasicImageRequest: DataRequest {
-
-    typealias Output = UIImage
-
-    let url: URL?
-    let requestMethod: RequestMethod
-
-    func convertResponse(data: Data, response _: URLResponse) throws -> UIImage {
-        guard let image = UIImage(data: data) else {
-            throw NSError.imageError
-        }
-        return image
-    }
-
-    func makeURL() throws -> URL {
-        guard let url = url else {
-            throw NSError.failedToCreateRequest
-        }
-        return url
-    }
-
-}
-
-#elseif canImport(AppKit)
-
-import AppKit
-
-struct BasicImageRequest: DataRequest {
-
-    typealias Output = NSImage
-
-    let url: URL?
-    let requestMethod: RequestMethod
-
-    func convertResponse(data: Data, response _: URLResponse) throws -> NSImage {
-        guard let image = NSImage(data: data) else {
-            throw NSError.imageError
-        }
-        return image
-    }
-
-    func makeURL() throws -> URL {
-        guard let url = url else {
-            throw NSError.failedToCreateRequest
-        }
-        return url
-    }
-
-}
-
-#endif
 
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
