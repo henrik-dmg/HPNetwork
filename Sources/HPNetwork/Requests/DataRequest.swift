@@ -3,7 +3,7 @@ import Foundation
 /// A protocol that's used to handle regular network request where data is downloaded
 public protocol DataRequest: NetworkRequest {
 
-    /// Called by ``schedule(delegate:)`` once the networking has finished.
+    /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)`` once the networking has finished.
     ///
     /// For more convenient handling of `Decodable` output types, use ``DecodableRequest``
     /// - Parameters:
@@ -12,7 +12,8 @@ public protocol DataRequest: NetworkRequest {
     /// - Returns: An instance of the specified output type
     func convertResponse(data: Data, response: URLResponse) throws -> Output
 
-    /// Called by ``schedule(delegate:)`` if the networking has finished successfully but `response` indicates an error.
+    /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)``
+    /// if the networking has finished successfully but `response` indicates an error.
     /// Can be used to simply log errors or inspect them otherwise
     ///
     /// The default implementation of this simply forwards the passed in error
@@ -22,18 +23,6 @@ public protocol DataRequest: NetworkRequest {
     ///		- response: The network response
     /// - Returns: The passed in or modified error
     func convertError(error: URLError, data: Data, response: URLResponse) -> Error
-
-}
-
-extension DataRequest {
-
-    func dataTaskResult(data: Data, response: URLResponse) throws -> Output {
-        if let error = response.urlError() {
-            throw convertError(error: error, data: data, response: response)
-        } else {
-            return try convertResponse(data: data, response: response)
-        }
-    }
 
 }
 
@@ -65,10 +54,10 @@ public extension DataRequest {
         }
     }
 
-    @discardableResult func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<Void, Never> {
+    @discardableResult func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<Void, Never> {
         Task {
             let result = await result(delegate: delegate)
-            DispatchQueue.main.async {
+            finishingQueue.async {
                 completion(result)
             }
         }
@@ -88,6 +77,20 @@ public extension DataRequest where Output == Data {
     /// - Returns: The raw data returned by the networking
     func convertResponse(data: Data, response _: URLResponse) throws -> Output {
         data
+    }
+
+}
+
+// MARK: - Result
+
+extension DataRequest {
+
+    func dataTaskResult(data: Data, response: URLResponse) throws -> Output {
+        if let error = response.urlError() {
+            throw convertError(error: error, data: data, response: response)
+        } else {
+            return try convertResponse(data: data, response: response)
+        }
     }
 
 }

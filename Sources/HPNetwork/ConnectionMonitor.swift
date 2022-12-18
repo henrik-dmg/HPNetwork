@@ -22,19 +22,18 @@ public final class ConnectionMonitor {
 
     // MARK: - Init
 
-    public init(requiredInterfaceType: NWInterface.InterfaceType) {
-        pathMonitor = NWPathMonitor(requiredInterfaceType: requiredInterfaceType)
-        pathMonitor.pathUpdateHandler = { [weak self] path in
-            self?.emitNotification(path)
-            self?.pathUpdateHandler?(path)
-        }
+    public convenience init(requiredInterfaceType: NWInterface.InterfaceType) {
+        self.init(pathMonitor: NWPathMonitor(requiredInterfaceType: requiredInterfaceType))
     }
 
-    public init() {
-        pathMonitor = NWPathMonitor()
+    public convenience init() {
+        self.init(pathMonitor: NWPathMonitor())
+    }
+
+    private init(pathMonitor: NWPathMonitor) {
+        self.pathMonitor = pathMonitor
         pathMonitor.pathUpdateHandler = { [weak self] path in
             self?.emitNotification(path)
-            self?.pathUpdateHandler?(path)
         }
     }
 

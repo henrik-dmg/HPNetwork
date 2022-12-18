@@ -7,18 +7,6 @@ public protocol DownloadRequest: NetworkRequest where Output == URL {
 
 }
 
-extension DownloadRequest {
-
-    func downloadTaskResult(url: URL, response: URLResponse) throws -> Output {
-        if let error = response.urlError() {
-            throw convertError(error: error, url: url, response: response)
-        } else {
-            return try convertResponse(url: url, response: response)
-        }
-    }
-
-}
-
 // MARK: - Scheduling and Convenience
 
 public extension DownloadRequest {
@@ -51,12 +39,26 @@ public extension DownloadRequest {
         }
     }
 
-    func schedule(delegate: URLSessionDataDelegate? = nil, completion: @escaping (Result<NetworkResponse<Output>, Error>) -> Void) -> Task<Void, Never> {
+    func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<Void, Never> {
         Task {
             let result = await result(delegate: delegate)
-            DispatchQueue.main.async {
+            finishingQueue.async {
                 completion(result)
             }
+        }
+    }
+
+}
+
+// MARK: - Result
+
+extension DownloadRequest {
+
+    func downloadTaskResult(url: URL, response: URLResponse) throws -> Output {
+        if let error = response.urlError() {
+            throw convertError(error: error, url: url, response: response)
+        } else {
+            return try convertResponse(url: url, response: response)
         }
     }
 
