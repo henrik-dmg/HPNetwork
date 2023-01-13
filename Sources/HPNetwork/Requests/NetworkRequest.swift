@@ -8,7 +8,7 @@ public protocol NetworkRequest<Output> {
     /// The expected output type returned in the network request
     associatedtype Output
 
-    associatedtype RequestResult = Result<NetworkResponse<Output>, Error>
+    typealias RequestResult = Result<NetworkResponse<Output>, Error>
 
     /// The `URLSession` that will be used to schedule the network request
     ///

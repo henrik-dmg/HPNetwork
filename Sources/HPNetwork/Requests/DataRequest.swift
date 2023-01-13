@@ -1,7 +1,7 @@
 import Foundation
 
 /// A protocol that's used to handle regular network request where data is downloaded
-public protocol DataRequest: NetworkRequest {
+public protocol DataRequest<Output>: NetworkRequest {
 
     /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)`` once the networking has finished.
     ///
