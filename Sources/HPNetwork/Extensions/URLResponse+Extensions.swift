@@ -8,7 +8,7 @@ public extension URLResponse {
         }
 
         switch httpResponse.statusCode {
-        case 200 ... 299:
+        case 200...299:
             return nil
         default:
             let errorCode = URLError.Code(rawValue: httpResponse.statusCode)

@@ -1,5 +1,6 @@
-@testable import HPNetwork
 import XCTest
+
+@testable import HPNetwork
 
 @available(iOS 15.0, macOS 12.0, *)
 class NetworkTests: XCTestCase {
@@ -77,10 +78,8 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
     }
 
     var headerFields: [HeaderField] {
-        [
-            RawHeaderField.acceptJSON,
-            ContentTypeHeaderField.json
-        ]
+        RawHeaderField.acceptJSON
+        ContentTypeHeaderField.json
     }
 
     func makeURL() throws -> URL {

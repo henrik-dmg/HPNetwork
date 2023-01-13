@@ -39,7 +39,9 @@ public extension DownloadRequest {
         }
     }
 
-    func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<Void, Never> {
+    func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<
+        Void, Never
+    > {
         Task {
             let result = await result(delegate: delegate)
             finishingQueue.async {

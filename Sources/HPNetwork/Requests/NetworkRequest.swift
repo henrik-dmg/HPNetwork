@@ -60,7 +60,8 @@ public protocol NetworkRequest<Output> {
     func schedule(
         delegate: URLSessionDataDelegate?,
         finishingQueue: DispatchQueue,
-        completion: @escaping (RequestResult) -> Void) -> Task<Void, Never>
+        completion: @escaping (RequestResult) -> Void
+    ) -> Task<Void, Never>
 
 }
 
