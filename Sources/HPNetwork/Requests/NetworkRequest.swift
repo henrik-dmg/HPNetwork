@@ -1,4 +1,6 @@
 import Foundation
+import HTTPTypes
+import HTTPTypesFoundation
 
 // MARK: - NetworkRequest
 
@@ -18,10 +20,10 @@ public protocol NetworkRequest<Output> {
     /// The header fields that will be send with the network request
     ///
     /// Defaults to an empty array
-    @HeaderFieldBuilder var headerFields: [HeaderField] { get }
+    @HTTPFieldsBuilder var headerFields: [HTTPField] { get }
 
     /// The request method that will be used
-    var requestMethod: RequestMethod { get }
+    var requestMethod: HTTPRequest.Method { get }
 
     /// The authorization method used to authorize the network request
     ///
@@ -30,7 +32,7 @@ public protocol NetworkRequest<Output> {
 
     /// A method used to construct or create the URL of the network request
     ///
-    /// This method is the very first call when calling ``response(delegate:)``, ``result(delegate:)`` or ``schedule(delegate:finishingQueue:completion:)``
+    /// This method is the very first call when calling scheduling a request
     func makeURL() throws -> URL
 
     /// The data that will be send in the HTTP body of the request
@@ -63,27 +65,43 @@ public protocol NetworkRequest<Output> {
         completion: @escaping (RequestResult) -> Void
     ) -> Task<Void, Never>
 
+    func validateResponse(_ response: HTTPResponse) throws
+
 }
 
 public extension NetworkRequest {
 
     /// Constructs a `URLRequest` from the provided values
     /// - Returns: a new `URLRequest` instance
-    func urlRequest() throws -> URLRequest {
+    func makeRequest() throws -> URLRequest {
         let url = try makeURL()
+        
+        var request = HTTPRequest(method: requestMethod, url: url)
 
-        var request = URLRequest(url: url)
-        request.httpMethod = requestMethod.rawValue
-        request.httpBody = try httpBody()
-        headerFields.forEach {
-            request.addHeaderField($0)
+        for field in headerFields {
+            request.headerFields.append(field)
         }
 
-        if let auth = authorization {
-            request.addHeaderField(AuthorizationHeaderField(auth))
+        if let authorization {
+            assert(request.headerFields[.authorization] == nil, "Authorization was already configured as part of header fields")
+            request.headerFields[.authorization] = authorization.headerString
         }
 
-        return request
+        guard var urlRequest = URLRequest(httpRequest: request) else {
+            throw NetworkRequestConversionError.failedToConvertHTTPRequestToURLRequest
+        }
+        urlRequest.httpBody = try httpBody()
+
+        return urlRequest
+    }
+
+    func validateResponse(_ response: HTTPResponse) throws {
+        switch response.status.kind {
+        case .clientError, .invalid, .redirection, .serverError:
+            throw URLError(URLError.Code(rawValue: response.status.code))
+        case .informational, .successful:
+            break
+        }
     }
 
 }
@@ -100,6 +118,11 @@ extension NetworkRequest {
 
 }
 
+enum NetworkRequestConversionError: Error {
+    case failedToConvertHTTPRequestToURLRequest
+    case failedToConvertURLResponseToHTTPResponse
+}
+
 // MARK: - Sensible Defaults
 
 public extension NetworkRequest {
@@ -108,7 +131,7 @@ public extension NetworkRequest {
 
     var urlSession: URLSession { .shared }
 
-    var headerFields: [HeaderField] { [] }
+    var headerFields: [HTTPField] { [] }
 
     var authorization: Authorization? { nil }
 

@@ -106,10 +106,6 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 }
 ```
 
-### Intercepting Errors
-
-By default, instances of `NetworkRequest` will simply forward any encountered errors to the completion block. If you want to do some custom error conversion based on the raw `Data` that was received, you can implement `func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error` in your request model.
-
 ### URLBuilder
 
 `URLBuilder` has been broken out into a separate package `HPURLBuilder` that can be found [here](https://github.com/henrik-dmg/HPURLBuilder)
@@ -121,11 +117,3 @@ To add authentication to a request, simply supply a `authentication: NetworkRequ
 ### Authors
 
 - Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
-
-## WIP
-
-- [x] Cancellation support
-- [x] Progress callback
-- [x] Improving the documentation
-- [x] Add `async` variants for the new Swift version
-- [ ] Cookie support

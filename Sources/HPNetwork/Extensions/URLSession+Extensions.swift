@@ -26,7 +26,7 @@ extension URLSession {
         return try await hp_dataContinuation(for: request)
     }
 
-    func hp_dataContinuation(for request: URLRequest) async throws -> (Data, URLResponse) {
+    private func hp_dataContinuation(for request: URLRequest) async throws -> (Data, URLResponse) {
         try await withCheckedThrowingContinuation { continuation in
             let task = dataTask(with: request) { data, response, error in
                 guard let data = data, let response = response else {
@@ -63,7 +63,7 @@ extension URLSession {
         return try await hp_downloadContinuation(for: request)
     }
 
-    func hp_downloadContinuation(for request: URLRequest) async throws -> (URL, URLResponse) {
+    private func hp_downloadContinuation(for request: URLRequest) async throws -> (URL, URLResponse) {
         try await withCheckedThrowingContinuation { continuation in
             let task = downloadTask(with: request) { url, response, error in
                 guard let url = url, let response = response else {

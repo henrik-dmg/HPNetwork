@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "HPNetwork",
     platforms: [
-        .iOS(.v13), .tvOS(.v13), .watchOS(.v6), .macOS(.v10_15),
+        .iOS(.v15), .tvOS(.v15), .watchOS(.v6), .macOS(.v12),
     ],
     products: [
         .library(
@@ -26,12 +26,19 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", branch: "main"),
-        .package(url: "https://github.com/apple/swift-format", branch: "main")
+        .package(url: "https://github.com/apple/swift-format", branch: "main"),
+        .package(url: "https://github.com/apple/swift-http-types.git", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
-        .target(name: "HPNetwork"),
+        .target(
+            name: "HPNetwork",
+            dependencies: [
+                .product(name: "HTTPTypes", package: "swift-http-types"),
+                .product(name: "HTTPTypesFoundation", package: "swift-http-types")
+            ]
+        ),
         .testTarget(
             name: "HPNetworkTests",
             dependencies: ["HPNetwork"]
