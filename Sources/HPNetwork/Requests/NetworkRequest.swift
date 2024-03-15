@@ -69,13 +69,13 @@ public protocol NetworkRequest<Output> {
 
 }
 
-public extension NetworkRequest {
+extension NetworkRequest {
 
     /// Constructs a `URLRequest` from the provided values
     /// - Returns: a new `URLRequest` instance
-    func makeRequest() throws -> URLRequest {
+    public func makeRequest() throws -> URLRequest {
         let url = try makeURL()
-        
+
         var request = HTTPRequest(method: requestMethod, url: url)
 
         for field in headerFields {
@@ -95,7 +95,7 @@ public extension NetworkRequest {
         return urlRequest
     }
 
-    func validateResponse(_ response: HTTPResponse) throws {
+    public func validateResponse(_ response: HTTPResponse) throws {
         switch response.status.kind {
         case .clientError, .invalid, .redirection, .serverError:
             throw URLError(URLError.Code(rawValue: response.status.code))
@@ -108,7 +108,11 @@ public extension NetworkRequest {
 
 extension NetworkRequest {
 
-    func calculateElapsedTime(startTime: DispatchTime, networkingEndTime: DispatchTime, processingEndTime: DispatchTime) -> (TimeInterval, TimeInterval) {
+    func calculateElapsedTime(
+        startTime: DispatchTime,
+        networkingEndTime: DispatchTime,
+        processingEndTime: DispatchTime
+    ) -> (TimeInterval, TimeInterval) {
         let networkingTime = Double(networkingEndTime.uptimeNanoseconds - startTime.uptimeNanoseconds)
         let processingTime = Double(processingEndTime.uptimeNanoseconds - networkingEndTime.uptimeNanoseconds)
 
@@ -125,14 +129,14 @@ enum NetworkRequestConversionError: Error {
 
 // MARK: - Sensible Defaults
 
-public extension NetworkRequest {
+extension NetworkRequest {
 
-    func httpBody() throws -> Data? { nil }
+    public func httpBody() throws -> Data? { nil }
 
-    var urlSession: URLSession { .shared }
+    public var urlSession: URLSession { .shared }
 
-    var headerFields: [HTTPField] { [] }
+    public var headerFields: [HTTPField] { [] }
 
-    var authorization: Authorization? { nil }
+    public var authorization: Authorization? { nil }
 
 }

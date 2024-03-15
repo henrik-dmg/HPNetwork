@@ -9,13 +9,13 @@ public protocol DownloadRequest: NetworkRequest where Output == URL {
 
 // MARK: - Scheduling and Convenience
 
-public extension DownloadRequest {
+extension DownloadRequest {
 
-    func convertResponse(url: URL, response _: URLResponse) throws -> Output {
+    public func convertResponse(url: URL, response _: URLResponse) throws -> Output {
         url
     }
 
-    @discardableResult func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
+    @discardableResult public func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
         let request = try makeRequest()
         let startTime = DispatchTime.now()
 
@@ -45,7 +45,7 @@ public extension DownloadRequest {
         )
     }
 
-    @discardableResult func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
+    @discardableResult public func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
         do {
             let result = try await response(delegate: delegate)
             return .success(result)
@@ -54,7 +54,11 @@ public extension DownloadRequest {
         }
     }
 
-    func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<
+    public func schedule(
+        delegate: URLSessionDataDelegate? = nil,
+        finishingQueue: DispatchQueue = .main,
+        completion: @escaping (RequestResult) -> Void
+    ) -> Task<
         Void, Never
     > {
         Task {

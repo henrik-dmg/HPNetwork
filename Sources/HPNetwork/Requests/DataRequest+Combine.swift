@@ -2,9 +2,9 @@
 import Combine
 import Foundation
 
-public extension DataRequest {
+extension DataRequest {
 
-    func dataTaskPublisher() -> AnyPublisher<Output, Error> {
+    public func dataTaskPublisher() -> AnyPublisher<Output, Error> {
         do {
             let request = try urlRequest()
             return dataTaskPublisher(with: request)

@@ -9,11 +9,11 @@ public protocol DecodableRequest<Output>: DataRequest where Output: Decodable {
 
 }
 
-public extension DecodableRequest {
+extension DecodableRequest {
 
-    var injectJSONOnError: Bool { false }
+    public var injectJSONOnError: Bool { false }
 
-    func convertResponse(data: Data, response _: HTTPResponse) throws -> Output {
+    public func convertResponse(data: Data, response _: HTTPResponse) throws -> Output {
         try decoder.decode(Output.self, from: data)
     }
 

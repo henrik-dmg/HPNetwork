@@ -1,5 +1,5 @@
-import XCTest
 import HTTPTypes
+import XCTest
 
 @testable import HPNetwork
 
