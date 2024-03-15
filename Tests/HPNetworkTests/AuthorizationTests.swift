@@ -1,5 +1,6 @@
-@testable import HPNetwork
 import XCTest
+
+@testable import HPNetwork
 
 final class AuthorizationTests: XCTestCase {
 

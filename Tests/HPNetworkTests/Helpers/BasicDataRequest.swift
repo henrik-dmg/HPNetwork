@@ -1,5 +1,5 @@
-import HPNetwork
 import Foundation
+import HPNetwork
 import HTTPTypes
 
 struct BasicDataRequest: DataRequest {

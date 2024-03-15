@@ -42,7 +42,7 @@ public final class NetworkClient: NetworkClientProtocol {
         delegate: (any URLSessionTaskDelegate)? = nil,
         finishingQueue: DispatchQueue = .main,
         completion: @escaping (Request.RequestResult) -> Void
-    ) -> Task<Void, Never> where Request : NetworkRequest {
+    ) -> Task<Void, Never> where Request: NetworkRequest {
         request.schedule(urlSession: urlSession, delegate: delegate, finishingQueue: finishingQueue, completion: completion)
     }
 
