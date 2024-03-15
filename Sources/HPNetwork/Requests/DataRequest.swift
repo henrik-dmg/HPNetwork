@@ -20,7 +20,9 @@ public protocol DataRequest<Output>: NetworkRequest {
 
 extension DataRequest {
 
-    @discardableResult public func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
+    @discardableResult public func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws
+        -> NetworkResponse<Output>
+    {
         let request = try makeRequest()
 
         let startTime = DispatchTime.now()
@@ -52,9 +54,11 @@ extension DataRequest {
         )
     }
 
-    @discardableResult public func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
+    @discardableResult public func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> Result<
+        NetworkResponse<Output>, Error
+    > {
         do {
-            let result = try await response(delegate: delegate)
+            let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
         } catch {
             return .failure(error)
@@ -62,12 +66,13 @@ extension DataRequest {
     }
 
     @discardableResult public func schedule(
-        delegate: URLSessionDataDelegate? = nil,
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?,
         finishingQueue: DispatchQueue = .main,
         completion: @escaping (RequestResult) -> Void
     ) -> Task<Void, Never> {
         Task {
-            let result = await result(delegate: delegate)
+            let result = await result(urlSession: urlSession, delegate: delegate)
             finishingQueue.async {
                 completion(result)
             }

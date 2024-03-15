@@ -10,12 +10,8 @@ public protocol NetworkRequest<Output> {
     /// The expected output type returned in the network request
     associatedtype Output
 
+    /// The result of a network request
     typealias RequestResult = Result<NetworkResponse<Output>, Error>
-
-    /// The `URLSession` that will be used to schedule the network request
-    ///
-    /// Defaults to `URLSession.shared`
-    var urlSession: URLSession { get }
 
     /// The header fields that will be send with the network request
     ///
@@ -44,14 +40,14 @@ public protocol NetworkRequest<Output> {
     /// - Parameters:
     /// 	- delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
-    func response(delegate: URLSessionDataDelegate?) async throws -> NetworkResponse<Output>
+    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
 
     /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
     /// - Parameters:
     ///     - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
     /// both networking and processing in seconds or an error
-    func result(delegate: URLSessionDataDelegate?) async -> RequestResult
+    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> RequestResult
 
     /// Uses all the provided information to create a `URLRequest` and schedules that request
     /// - Parameters:
@@ -60,7 +56,8 @@ public protocol NetworkRequest<Output> {
     ///   - completion: The block that will be executed with the result of the network request
     /// - Returns: A task that wraps the running network request
     func schedule(
-        delegate: URLSessionDataDelegate?,
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?,
         finishingQueue: DispatchQueue,
         completion: @escaping (RequestResult) -> Void
     ) -> Task<Void, Never>
@@ -133,10 +130,39 @@ extension NetworkRequest {
 
     public func httpBody() throws -> Data? { nil }
 
-    public var urlSession: URLSession { .shared }
-
     public var headerFields: [HTTPField] { [] }
 
     public var authorization: Authorization? { nil }
+
+    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
+    /// - Parameters:
+    ///     - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
+    func response(urlSession: URLSession) async throws -> NetworkResponse<Output> {
+        try await response(urlSession: urlSession, delegate: nil)
+    }
+
+    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
+    /// - Parameters:
+    ///     - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
+    /// both networking and processing in seconds or an error
+    func result(urlSession: URLSession) async -> RequestResult {
+        await result(urlSession: urlSession, delegate: nil)
+    }
+
+    /// Uses all the provided information to create a `URLRequest` and schedules that request
+    /// - Parameters:
+    ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    ///   - finishingQueue: The `DispatchQueue` that the completion handler will be called on
+    ///   - completion: The block that will be executed with the result of the network request
+    /// - Returns: A task that wraps the running network request
+    func schedule(
+        urlSession: URLSession,
+        finishingQueue: DispatchQueue = .main,
+        completion: @escaping (RequestResult) -> Void
+    ) -> Task<Void, Never> {
+        schedule(urlSession: urlSession, delegate: nil, finishingQueue: finishingQueue, completion: completion)
+    }
 
 }

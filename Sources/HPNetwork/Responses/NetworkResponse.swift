@@ -16,4 +16,11 @@ public struct NetworkResponse<Output> {
     /// The time that elapsed during the processing of the network request's result
     public let processingDuration: TimeInterval
 
+    public init(output: Output, response: HTTPResponse, networkingDuration: TimeInterval, processingDuration: TimeInterval) {
+        self.output = output
+        self.response = response
+        self.networkingDuration = networkingDuration
+        self.processingDuration = processingDuration
+    }
+
 }

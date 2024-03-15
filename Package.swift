@@ -14,14 +14,8 @@ let package = Package(
             targets: ["HPNetwork"]
         ),
         .library(
-            name: "HPNetwork-Dynamic",
-            type: .dynamic,
-            targets: ["HPNetwork"]
-        ),
-        .library(
-            name: "HPNetwork-Static",
-            type: .static,
-            targets: ["HPNetwork"]
+            name: "HPNetworkMock",
+            targets: ["HPNetworkMock"]
         ),
     ],
     dependencies: [
@@ -39,9 +33,15 @@ let package = Package(
                 .product(name: "HTTPTypesFoundation", package: "swift-http-types")
             ]
         ),
+        .target(
+            name: "HPNetworkMock",
+            dependencies: [
+                "HPNetwork"
+            ]
+        ),
         .testTarget(
             name: "HPNetworkTests",
-            dependencies: ["HPNetwork"]
+            dependencies: ["HPNetwork", "HPNetworkMock"]
         ),
     ]
 )

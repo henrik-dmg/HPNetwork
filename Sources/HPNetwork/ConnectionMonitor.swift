@@ -5,7 +5,6 @@ public final class ConnectionMonitor {
 
     // MARK: - Properties
 
-    public static let `default` = ConnectionMonitor()
     public static let connectionBecameSatisfiedNotification = Notification.Name("ConnectionBecameSatisfiedNotification")
     public static let connectionBecameUnsatisfiedNotification = Notification.Name("ConnectionBecameSatisfiedNotification")
     public static let connectionRequiresConnectionNoticication = Notification.Name("ConnectionRequiresConnectionNoticication")
