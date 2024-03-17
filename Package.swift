@@ -30,7 +30,7 @@ let package = Package(
             name: "HPNetwork",
             dependencies: [
                 .product(name: "HTTPTypes", package: "swift-http-types"),
-                .product(name: "HTTPTypesFoundation", package: "swift-http-types")
+                .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
             ]
         ),
         .target(

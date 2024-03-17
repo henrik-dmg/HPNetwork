@@ -1,15 +1,11 @@
-import HTTPTypes
 import XCTest
 
 @testable import HPNetwork
 @testable import HPNetworkMock
 
-enum URLError: LocalizedError {
-    case urlNil
-}
-
-@available(iOS 15.0, macOS 12.0, *)
 class NetworkClientMockTests: XCTestCase {
+
+    // MARK: - Properties
 
     let url = URL(string: "https://ipapi.co/json")!
 
@@ -18,6 +14,8 @@ class NetworkClientMockTests: XCTestCase {
         client.fallbackToURLSessionIfNoMatchingMock = false
         return client
     }()
+
+    // MARK: - Tests
 
     func testBasicRequest_Async() async throws {
         networkClient.mockRequest(ofType: BasicDecodableRequest<Int>.self) { _ in

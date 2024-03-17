@@ -1,7 +1,7 @@
 import Foundation
 import Network
 
-public final class ConnectionMonitor {
+public final class ConnectionMonitor: ObservableObject {
 
     // MARK: - Properties
 
@@ -10,14 +10,9 @@ public final class ConnectionMonitor {
     public static let connectionRequiresConnectionNoticication = Notification.Name("ConnectionRequiresConnectionNoticication")
     public static let updatedPathKey = "ConnectionMonitorUpdatedPathKey"
 
+    @Published public private(set) var currentPath: NWPath
+
     private let pathMonitor: NWPathMonitor
-
-    public var pathUpdateHandler: ((NWPath) -> Void)?
-    public private(set) var isMonitoring = false
-
-    public var currentPath: NWPath? {
-        isMonitoring ? pathMonitor.currentPath : nil
-    }
 
     // MARK: - Init
 
@@ -29,17 +24,26 @@ public final class ConnectionMonitor {
         self.init(pathMonitor: NWPathMonitor())
     }
 
-    private init(pathMonitor: NWPathMonitor) {
+    private init(
+        pathMonitor: NWPathMonitor,
+        queue: DispatchQueue = DispatchQueue(label: "dev.panhans.ConnectionMonitor", qos: .background)
+    ) {
+        self._currentPath = Published(initialValue: pathMonitor.currentPath)
         self.pathMonitor = pathMonitor
-        pathMonitor.pathUpdateHandler = { [weak self] path in
+
+        self.pathMonitor.pathUpdateHandler = { [weak self] path in
             self?.emitNotification(path)
         }
+        self.pathMonitor.start(queue: queue)
     }
 
     // MARK: - State Changes
 
     private func emitNotification(_ path: NWPath) {
+        print("Updated")
         let userInfo = [ConnectionMonitor.updatedPathKey: path]
+
+        currentPath = path
 
         switch path.status {
         case .satisfied:
@@ -63,18 +67,6 @@ public final class ConnectionMonitor {
         @unknown default:
             break
         }
-    }
-
-    // MARK: - Notifications
-
-    public func startMonitoring(on queue: DispatchQueue = .init(label: "dev.panhans.ConnectionMonitor", qos: .background)) {
-        pathMonitor.start(queue: queue)
-        isMonitoring = true
-    }
-
-    public func stopMonitoring() {
-        pathMonitor.cancel()
-        isMonitoring = false
     }
 
 }

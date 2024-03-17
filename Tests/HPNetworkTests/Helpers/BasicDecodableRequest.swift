@@ -1,6 +1,5 @@
 import Foundation
 import HPNetwork
-import HTTPTypes
 
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
