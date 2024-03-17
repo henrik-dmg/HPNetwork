@@ -9,8 +9,6 @@ public enum NetworkClientMockError: Error {
 private protocol MockedRequest<Request> {
     associatedtype Request: NetworkRequest
     typealias RequestHandler = (Request) async throws -> Request.Output
-
-    var handler: RequestHandler { get }
 }
 
 public final class NetworkClientMock: NetworkClientProtocol {

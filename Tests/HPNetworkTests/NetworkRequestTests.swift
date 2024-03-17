@@ -13,4 +13,9 @@ final class NetworkRequestTests: XCTestCase {
         XCTAssertNotNil(urlRequest.allHTTPHeaderFields?["Authorization"])
     }
 
+    func testNetworkRequest_ThrowsError_WhenURLIsNil() throws {
+        let request = FaultyRequest()
+        XCTAssertThrowsError(try request.makeRequest())
+    }
+
 }

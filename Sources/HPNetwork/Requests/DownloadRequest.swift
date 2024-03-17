@@ -15,9 +15,10 @@ extension DownloadRequest {
         url
     }
 
-    @discardableResult public func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws
-        -> NetworkResponse<Output>
-    {
+    @discardableResult public func response(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async throws -> NetworkResponse<Output> {
         let request = try makeRequest()
         let startTime = DispatchTime.now()
 
@@ -47,9 +48,10 @@ extension DownloadRequest {
         )
     }
 
-    @discardableResult public func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> Result<
-        NetworkResponse<Output>, Error
-    > {
+    @discardableResult public func result(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async -> RequestResult {
         do {
             let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
@@ -63,9 +65,7 @@ extension DownloadRequest {
         delegate: (any URLSessionTaskDelegate)?,
         finishingQueue: DispatchQueue = .main,
         completion: @escaping (RequestResult) -> Void
-    ) -> Task<
-        Void, Never
-    > {
+    ) -> Task<Void, Never> {
         Task {
             let result = await result(urlSession: urlSession, delegate: delegate)
             finishingQueue.async {

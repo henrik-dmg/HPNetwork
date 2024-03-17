@@ -40,7 +40,6 @@ public final class ConnectionMonitor: ObservableObject {
     // MARK: - State Changes
 
     private func emitNotification(_ path: NWPath) {
-        print("Updated")
         let userInfo = [ConnectionMonitor.updatedPathKey: path]
 
         currentPath = path
