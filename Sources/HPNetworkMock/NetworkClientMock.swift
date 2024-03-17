@@ -6,16 +6,16 @@ public enum NetworkClientMockError: Error {
     case noMockConfiguredForRequest
 }
 
+private protocol MockedRequest<Request> {
+    associatedtype Request: NetworkRequest
+    typealias RequestHandler = (Request) async throws -> Request.Output
+
+    var handler: RequestHandler { get }
+}
+
 public final class NetworkClientMock: NetworkClientProtocol {
 
     // MARK: - Nested Types
-
-    private protocol MockedRequest<Request> {
-        associatedtype Request: NetworkRequest
-        typealias RequestHandler = (Request) async throws -> Request.Output
-
-        var handler: RequestHandler { get }
-    }
 
     private struct ConcreteMockedRequest<Request: NetworkRequest>: MockedRequest {
         let handler: RequestHandler
