@@ -1,6 +1,6 @@
 # HPNetwork
 
-![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
+![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg) [![codecov](https://codecov.io/gh/henrik-dmg/HPNetwork/graph/badge.svg?token=WZU3LZK4VD)](https://codecov.io/gh/henrik-dmg/HPNetwork)
 
 `HPNetwork` is a protocol-based networking stack written in pure Swift
 
@@ -8,7 +8,7 @@
 
 ### SPM
 
-Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork/tree/feature/async", from: "3.0.0")` to your `Package.swift`
+Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "4.0.0")` to your `Package.swift`
 
 ### CocoaPods
 
