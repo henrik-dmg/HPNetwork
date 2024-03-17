@@ -6,13 +6,9 @@
 
 ## Installation
 
-### SPM
+Starting with v4 HPNetwork is only available via Swift Package Manager.
 
 Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "4.0.0")` to your `Package.swift`
-
-### CocoaPods
-
-Add `pod 'HPNetwork'` to your Podfile and run `pod install`
 
 ## Scheduling Requests
 
