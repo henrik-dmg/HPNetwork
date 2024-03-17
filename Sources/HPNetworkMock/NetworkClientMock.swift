@@ -15,6 +15,7 @@ public final class NetworkClientMock: NetworkClientProtocol {
 
     // MARK: - Nested Types
 
+    // periphery:ignore
     private struct ConcreteMockedRequest<Request: NetworkRequest>: MockedRequest {
         let handler: RequestHandler
     }

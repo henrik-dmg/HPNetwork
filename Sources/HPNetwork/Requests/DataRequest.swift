@@ -9,8 +9,8 @@ public protocol DataRequest<Output>: NetworkRequest {
     ///
     /// For more convenient handling of `Decodable` output types, use ``DecodableRequest``
     /// - Parameters:
-    /// 	- data: The raw data returned by the networking
-    /// 	- response: The network response
+    ///  - data: The raw data returned by the networking
+    ///  - response: The network response
     /// - Returns: An instance of the specified output type
     /// - Throws: When converting the data to the desired output type failed
     func convertResponse(data: Data, response: HTTPResponse) throws -> Output
@@ -90,9 +90,10 @@ extension DataRequest where Output == Data {
     /// Called by ``schedule(delegate:)`` once the networking has finished.
     ///
     /// - Parameters:
-    /// 	- data: The raw data returned by the networking
-    /// 	- response: The network response
+    ///  - data: The raw data returned by the networking
+    ///  - response: The network response
     /// - Returns: The raw data returned by the networking
+    /// - Throws: Doesn't throw, because the input `data` is simply forwarded
     public func convertResponse(data: Data, response: HTTPResponse) throws -> Output {
         data
     }

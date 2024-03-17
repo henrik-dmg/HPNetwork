@@ -1,6 +1,7 @@
 import Foundation
 import HPNetwork
 
+// periphery:ignore
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
     let url: URL?

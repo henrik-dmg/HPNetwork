@@ -41,6 +41,7 @@ public protocol NetworkRequest<Output> {
     ///   - urlSession: The `URLSession` instance to use to execute this network request
     ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
+    /// - Throws: Throws an error when anything went wrong while executing the network request
     func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
 
     /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly.
@@ -66,14 +67,16 @@ public protocol NetworkRequest<Output> {
     ) -> Task<Void, Never>
 
     /// A method that can be used to validate the response of a network request before any further processing will be attempted.
+    ///
     /// The response can be checked for status codes for example.
+    /// - Throws: Throws an error when the response is deemed an error (for example for 400 status codes and the likes)
     func validateResponse(_ response: HTTPResponse) throws
 
 }
 
 extension NetworkRequest {
 
-    /// Constructs a `URLRequest` from the provided values
+    /// Constructs a `URLRequest` from the provided values.
     /// - Returns: a new `URLRequest` instance
     public func makeRequest() throws -> URLRequest {
         let url = try makeURL()
@@ -90,6 +93,7 @@ extension NetworkRequest {
         }
 
         guard var urlRequest = URLRequest(httpRequest: request) else {
+            // Should theoretically never throw because we verify beforehand that `URL` is not nil
             throw NetworkRequestConversionError.failedToConvertHTTPRequestToURLRequest
         }
         urlRequest.httpBody = try httpBody()
@@ -139,26 +143,25 @@ extension NetworkRequest {
 
     public var authorization: Authorization? { nil }
 
-    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
-    /// - Parameters:
-    ///     - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly.
+    /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
+    /// - Throws: Throws an error when anything went wrong while executing the network request
     public func response(urlSession: URLSession) async throws -> NetworkResponse<Output> {
         try await response(urlSession: urlSession, delegate: nil)
     }
 
-    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly
-    /// - Parameters:
-    ///     - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly.
+    /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
     /// both networking and processing in seconds or an error
     public func result(urlSession: URLSession) async -> RequestResult {
         await result(urlSession: urlSession, delegate: nil)
     }
 
-    /// Uses all the provided information to create a `URLRequest` and schedules that request
+    /// Uses all the provided information to create a `URLRequest` and schedules that request.
     /// - Parameters:
-    ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
+    ///   - urlSession: The `URLSession` instance to use to execute this network request
     ///   - finishingQueue: The `DispatchQueue` that the completion handler will be called on
     ///   - completion: The block that will be executed with the result of the network request
     /// - Returns: A task that wraps the running network request
