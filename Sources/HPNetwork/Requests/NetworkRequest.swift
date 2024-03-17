@@ -88,7 +88,6 @@ extension NetworkRequest {
         }
 
         if let authorization {
-            assert(request.headerFields[.authorization] == nil, "Authorization was already configured as part of header fields")
             request.headerFields[.authorization] = authorization.headerString
         }
 

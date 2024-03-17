@@ -11,6 +11,7 @@ final class HTTPFieldBuilderTests: XCTestCase {
         }
         XCTAssertEqual(fields, [HTTPField.contentType(.applicationJSON)])
     }
+
     func testFieldBuiler_Array() {
         let expectedFields = [HTTPField.contentType(.applicationJSON), HTTPField.contentType(.applicationJSON)]
         let fields = buildHTTPFields {
