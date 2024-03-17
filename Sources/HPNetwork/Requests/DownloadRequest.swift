@@ -1,66 +1,76 @@
 import Foundation
+import HTTPTypes
 
 public protocol DownloadRequest: NetworkRequest where Output == URL {
 
-    func convertResponse(url: URL, response: URLResponse) throws -> Output
-    func convertError(error: URLError, url: URL, response: URLResponse) -> Error
+    func convertResponse(url: URL, response: HTTPResponse) throws -> Output
 
 }
 
 // MARK: - Scheduling and Convenience
 
-public extension DownloadRequest {
+extension DownloadRequest {
 
-    func convertResponse(url: URL, response _: URLResponse) throws -> Output {
+    public func convertResponse(url: URL, response: HTTPResponse) throws -> Output {
         url
     }
 
-    func convertError(error: URLError, url _: URL, response _: URLResponse) -> Error {
-        error
-    }
-
-    @discardableResult func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
-        let urlRequest = try urlRequest()
+    @discardableResult public func response(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async throws -> NetworkResponse<Output> {
+        let request = try makeRequest()
         let startTime = DispatchTime.now()
-        let result = try await urlSession.hp_download(for: urlRequest, delegate: delegate)
+
+        let (url, response) = try await urlSession.download(for: request, delegate: delegate)
+
         let networkingEndTime = DispatchTime.now()
-        let convertedResult = try downloadTaskResult(url: result.0, response: result.1)
+
+        guard let httpResponse = (response as? HTTPURLResponse)?.httpResponse else {
+            throw NetworkRequestConversionError.failedToConvertURLResponseToHTTPResponse
+        }
+
+        try validateResponse(httpResponse)
+        let convertedResult = try convertResponse(url: url, response: httpResponse)
+
         let processingEndTime = DispatchTime.now()
-        let elapsedTime = calculateElapsedTime(startTime: startTime, networkingEndTime: networkingEndTime, processingEndTime: processingEndTime)
-        return NetworkResponse(output: convertedResult, response: result.1, networkingDuration: elapsedTime.0, processingDuration: elapsedTime.1)
+
+        let elapsedTime = calculateElapsedTime(
+            startTime: startTime,
+            networkingEndTime: networkingEndTime,
+            processingEndTime: processingEndTime
+        )
+        return NetworkResponse(
+            output: convertedResult,
+            response: httpResponse,
+            networkingDuration: elapsedTime.0,
+            processingDuration: elapsedTime.1
+        )
     }
 
-    @discardableResult func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
+    @discardableResult public func result(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async -> RequestResult {
         do {
-            let result = try await response(delegate: delegate)
+            let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
         } catch {
             return .failure(error)
         }
     }
 
-    func schedule(delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void) -> Task<
-        Void, Never
-    > {
+    public func schedule(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?,
+        finishingQueue: DispatchQueue = .main,
+        completion: @escaping (RequestResult) -> Void
+    ) -> Task<Void, Never> {
         Task {
-            let result = await result(delegate: delegate)
+            let result = await result(urlSession: urlSession, delegate: delegate)
             finishingQueue.async {
                 completion(result)
             }
-        }
-    }
-
-}
-
-// MARK: - Result
-
-extension DownloadRequest {
-
-    func downloadTaskResult(url: URL, response: URLResponse) throws -> Output {
-        if let error = response.urlError() {
-            throw convertError(error: error, url: url, response: response)
-        } else {
-            return try convertResponse(url: url, response: response)
         }
     }
 

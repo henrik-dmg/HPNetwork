@@ -6,3 +6,4 @@ xcuserdata/
 .swiftpm
 icon-configuration.json
 .vscode
+/coverage

@@ -1,22 +1,16 @@
 # HPNetwork
 
-![HPNetwork](/Assets/Banner.png)
-
-![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
+![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg) [![codecov](https://codecov.io/gh/henrik-dmg/HPNetwork/graph/badge.svg?token=WZU3LZK4VD)](https://codecov.io/gh/henrik-dmg/HPNetwork)
 
 `HPNetwork` is a protocol-based networking stack written in pure Swift
 
 ## Installation
 
-### SPM
+Starting with v4 HPNetwork is only available via Swift Package Manager.
 
-Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork/tree/feature/async", from: "3.0.0")` to your `Package.swift`
+Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode project or `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "4.0.0")` to your `Package.swift`
 
-### CocoaPods
-
-Add `pod 'HPNetwork'` to your Podfile and run `pod install`
-
-## Posting Request
+## Scheduling Requests
 
 Scheduling a request is as easy as this:
 
@@ -26,17 +20,24 @@ let response = try await request.response()
 
 The `response` is a `NetworkResponse<Output>` containing the output and statisticsof the request.
 
-### Combine
+You can also get an async result:
 
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the `response()` method.
+```swift
+let result = await request.result() // Result<NetworkResponse<Output>, Error>
+```
 
-### Synchronous Requests
+Or schedule requests callback-based:
 
-If you do stuff like writing CLIs with Swift or need to do synchronous networking for any reason, you can use `scheduleSynchronously(...)` which returns the same `Result<NetworkRequest.Output, Error>` as in the closure of the regular method call. There's also a convenience method for `NetworkRequest` directly which you can call by `request.scheduleSynchronously(...)`
-
-### Cancelling Requests
-
-Any call to `schedule(request) { result in ... }` returns an instance of `NetworkTask` that you can cancel by calling `task.cancel()`
+```swift
+let task = request.schedule { result in
+    switch result {
+    case .success(let response):
+        // handle response
+    case .failure(let error):
+        // handle error
+    }
+}
+```
 
 ## Creating Requests
 
@@ -51,7 +52,7 @@ struct BasicDataRequest: DataRequest {
 
     typealias Output = Data
 
-    var requestMethod: NetworkRequestMethod {
+    var requestMethod: HTTPRequest.Method {
         .get
     }
 
@@ -70,7 +71,7 @@ struct BasicDataRequest: DataRequest {
     typealias Output = Data
 
     let url: URL?
-    let requestMethod: NetworkRequestMethod
+    let requestMethod: HTTPRequest.Method
 
     func makeURL() throws -> URL {
 		// construct your URL here
@@ -93,7 +94,7 @@ If you're working with JSON, you can also use `DecodableRequest` which requires 
 ```swift
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
-    let requestMethod: NetworkRequestMethod
+    let requestMethod: HTTPRequest.Method
 
     var decoder: JSONDecoder {
         JSONDecoder() // use default or custom decoder
@@ -106,26 +107,15 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 }
 ```
 
-### Intercepting Errors
-
-By default, instances of `NetworkRequest` will simply forward any encountered errors to the completion block. If you want to do some custom error conversion based on the raw `Data` that was received, you can implement `func convertError(_ error: Error, data: Data?, response: URLResponse?) -> Error` in your request model.
-
 ### URLBuilder
 
 `URLBuilder` has been broken out into a separate package `HPURLBuilder` that can be found [here](https://github.com/henrik-dmg/HPURLBuilder)
 
-### Request Authentication
+### Request Authorization
 
-To add authentication to a request, simply supply a `authentication: NetworkRequestAuthentication?` instance to your request. `NetworkRequestAuthentication` is an enum and supports basic authentication with a username and password, bearer token authorisation or a raw option if you want full control.
+To add authorization to a request, simply supply a `authorization: Authorization?` instance to your request.
+You can either use `BasicAuthorization` for basic authentication with a username and password, or `BearerAuthorization` for bearer token authorization or implement you own custom `Authorization` type.
 
 ### Authors
 
 - Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
-
-## WIP
-
-- [x] Cancellation support
-- [x] Progress callback
-- [x] Improving the documentation
-- [x] Add `async` variants for the new Swift version
-- [ ] Cookie support

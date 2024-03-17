@@ -1,64 +1,80 @@
 import Foundation
+import HTTPTypes
+import HTTPTypesFoundation
 
-/// A protocol that's used to handle regular network request where data is downloaded
+/// A protocol that's used to handle regular network request where data is downloaded.
 public protocol DataRequest<Output>: NetworkRequest {
 
     /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)`` once the networking has finished.
     ///
     /// For more convenient handling of `Decodable` output types, use ``DecodableRequest``
     /// - Parameters:
-    /// 	- data: The raw data returned by the networking
-    /// 	- response: The network response
+    ///  - data: The raw data returned by the networking
+    ///  - response: The network response
     /// - Returns: An instance of the specified output type
-    func convertResponse(data: Data, response: URLResponse) throws -> Output
-
-    /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)``
-    /// if the networking has finished successfully but `response` indicates an error.
-    /// Can be used to simply log errors or inspect them otherwise
-    ///
-    /// The default implementation of this simply forwards the passed in error
-    /// - Parameters:
-    /// 	- error: The error that occured based on `response`
-    ///		- data: The raw data returned by the networking
-    ///		- response: The network response
-    /// - Returns: The passed in or modified error
-    func convertError(error: URLError, data: Data, response: URLResponse) -> Error
+    /// - Throws: When converting the data to the desired output type failed
+    func convertResponse(data: Data, response: HTTPResponse) throws -> Output
 
 }
 
 // MARK: - Scheduling and Convenience
 
-public extension DataRequest {
+extension DataRequest {
 
-    func convertError(error: URLError, data _: Data, response _: URLResponse) -> Error {
-        error
-    }
-
-    @discardableResult func response(delegate: URLSessionDataDelegate? = nil) async throws -> NetworkResponse<Output> {
-        let urlRequest = try urlRequest()
+    @discardableResult public func response(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async throws -> NetworkResponse<Output> {
+        // Make request
+        let request = try makeRequest()
+        // Keep track of start time
         let startTime = DispatchTime.now()
-        let result = try await urlSession.hp_data(for: urlRequest, delegate: delegate)
+        // Actually execute network request
+        let (data, response) = try await urlSession.data(for: request, delegate: delegate)
+        // Keep track of networking duration
         let networkingEndTime = DispatchTime.now()
-        let convertedResult = try dataTaskResult(data: result.0, response: result.1)
-        let processingEndTime = DispatchTime.now()
-        let elapsedTime = calculateElapsedTime(startTime: startTime, networkingEndTime: networkingEndTime, processingEndTime: processingEndTime)
-        return NetworkResponse(output: convertedResult, response: result.1, networkingDuration: elapsedTime.0, processingDuration: elapsedTime.1)
+        // Convert response
+        guard let httpResponse = (response as? HTTPURLResponse)?.httpResponse else {
+            throw NetworkRequestConversionError.failedToConvertURLResponseToHTTPResponse
+        }
+        // Validate response and convert output
+        try validateResponse(httpResponse)
+        let convertedResult = try convertResponse(data: data, response: httpResponse)
+        // Calculate total elapsed times
+        let elapsedTime = calculateElapsedTime(
+            startTime: startTime,
+            networkingEndTime: networkingEndTime,
+            processingEndTime: DispatchTime.now()
+        )
+        // Return a NetworkResponse
+        return NetworkResponse(
+            output: convertedResult,
+            response: httpResponse,
+            networkingDuration: elapsedTime.0,
+            processingDuration: elapsedTime.1
+        )
     }
 
-    @discardableResult func result(delegate: URLSessionDataDelegate? = nil) async -> Result<NetworkResponse<Output>, Error> {
+    @discardableResult public func result(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?
+    ) async -> RequestResult {
         do {
-            let result = try await response(delegate: delegate)
+            let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
         } catch {
             return .failure(error)
         }
     }
 
-    @discardableResult func schedule(
-        delegate: URLSessionDataDelegate? = nil, finishingQueue: DispatchQueue = .main, completion: @escaping (RequestResult) -> Void
+    @discardableResult public func schedule(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?,
+        finishingQueue: DispatchQueue = .main,
+        completion: @escaping (RequestResult) -> Void
     ) -> Task<Void, Never> {
         Task {
-            let result = await result(delegate: delegate)
+            let result = await result(urlSession: urlSession, delegate: delegate)
             finishingQueue.async {
                 completion(result)
             }
@@ -69,30 +85,17 @@ public extension DataRequest {
 
 // MARK: - Raw Data
 
-public extension DataRequest where Output == Data {
+extension DataRequest where Output == Data {
 
     /// Called by ``schedule(delegate:)`` once the networking has finished.
     ///
     /// - Parameters:
-    /// 	- data: The raw data returned by the networking
-    /// 	- response: The network response
+    ///  - data: The raw data returned by the networking
+    ///  - response: The network response
     /// - Returns: The raw data returned by the networking
-    func convertResponse(data: Data, response _: URLResponse) throws -> Output {
+    /// - Throws: Doesn't throw, because the input `data` is simply forwarded
+    public func convertResponse(data: Data, response: HTTPResponse) throws -> Output {
         data
-    }
-
-}
-
-// MARK: - Result
-
-extension DataRequest {
-
-    func dataTaskResult(data: Data, response: URLResponse) throws -> Output {
-        if let error = response.urlError() {
-            throw convertError(error: error, data: data, response: response)
-        } else {
-            return try convertResponse(data: data, response: response)
-        }
     }
 
 }
