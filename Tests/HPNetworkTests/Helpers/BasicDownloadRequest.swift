@@ -1,13 +1,8 @@
 import Foundation
 import HPNetwork
 
-enum URLError: Error {
-    case urlNil
-}
+struct BasicDownloadRequest: DownloadRequest {
 
-struct BasicDataRequest: DataRequest {
-
-    typealias Output = Data
     let url: URL?
     let requestMethod: HTTPRequest.Method
     let authorization: (any Authorization)?

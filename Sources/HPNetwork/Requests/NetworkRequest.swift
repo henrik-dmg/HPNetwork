@@ -16,7 +16,7 @@ public protocol NetworkRequest<Output> {
     /// The header fields that will be send with the network request.
     ///
     /// Defaults to an empty array
-    @HTTPFieldsBuilder var headerFields: [HTTPField] { get }
+    @HTTPFieldBuilder var headerFields: [HTTPField] { get }
 
     /// The request method that will be used.
     var requestMethod: HTTPRequest.Method { get }

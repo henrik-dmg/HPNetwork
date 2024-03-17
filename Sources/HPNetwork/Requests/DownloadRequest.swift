@@ -11,7 +11,7 @@ public protocol DownloadRequest: NetworkRequest where Output == URL {
 
 extension DownloadRequest {
 
-    public func convertResponse(url: URL, response _: URLResponse) throws -> Output {
+    public func convertResponse(url: URL, response: HTTPResponse) throws -> Output {
         url
     }
 

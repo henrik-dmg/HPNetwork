@@ -17,13 +17,6 @@ final class DataRequestTests: XCTestCase {
 
     lazy var networkClient = NetworkClient(urlSession: mockedURLSession)
 
-    // MARK: - Test Lifecycle
-
-    override func tearDown() {
-        URLSessionMock.unregisterAllMockedRequests()
-        super.tearDown()
-    }
-
     // MARK: - Tests
 
     func testBasicRequest_Async() async throws {

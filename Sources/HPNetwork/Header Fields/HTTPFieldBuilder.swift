@@ -2,10 +2,18 @@ import Foundation
 import HTTPTypes
 
 @resultBuilder
-public enum HTTPFieldsBuilder {
+public enum HTTPFieldBuilder {
 
     public static func buildBlock(_ components: [HTTPField]...) -> [HTTPField] {
         components.flatMap { $0 }
+    }
+
+    public static func buildOptional(_ component: [HTTPField]?) -> [HTTPField] {
+        component ?? []
+    }
+
+    public static func buildOptional(_ component: [HTTPField?]?) -> [HTTPField] {
+        component?.compactMap { $0 } ?? []
     }
 
     /// Add support for both single and collections of constraints.
@@ -15,11 +23,6 @@ public enum HTTPFieldsBuilder {
 
     public static func buildExpression(_ expression: [HTTPField]) -> [HTTPField] {
         expression
-    }
-
-    /// Add support for optionals.
-    public static func buildOptional(_ components: [HTTPField]?) -> [HTTPField] {
-        components ?? []
     }
 
     /// Add support for if statements.
