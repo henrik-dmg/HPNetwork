@@ -14,7 +14,7 @@ Add a new dependency for `https://github.com/henrik-dmg/HPNetwork` to your Xcode
 
 Add `pod 'HPNetwork'` to your Podfile and run `pod install`
 
-## Posting Request
+## Scheduling Requests
 
 Scheduling a request is as easy as this:
 
@@ -24,17 +24,24 @@ let response = try await request.response()
 
 The `response` is a `NetworkResponse<Output>` containing the output and statisticsof the request.
 
-### Combine
+You can also get an async result:
 
-You can also call `dataTaskPublisher()` on any `NetworkRequest` instance to get a `AnyPublisher<Request.Output, Error`. The publisher will walk through the same validation and error handling process as the `response()` method.
+```swift
+let result = await request.result() // Result<NetworkResponse<Output>, Error>
+```
 
-### Synchronous Requests
+Or schedule requests callback-based:
 
-If you do stuff like writing CLIs with Swift or need to do synchronous networking for any reason, you can use `scheduleSynchronously(...)` which returns the same `Result<NetworkRequest.Output, Error>` as in the closure of the regular method call. There's also a convenience method for `NetworkRequest` directly which you can call by `request.scheduleSynchronously(...)`
-
-### Cancelling Requests
-
-Any call to `schedule(request) { result in ... }` returns an instance of `NetworkTask` that you can cancel by calling `task.cancel()`
+```swift
+let task = request.schedule { result in
+    switch result {
+    case .success(let response):
+        // handle response
+    case .failure(let error):
+        // handle error
+    }
+}
+```
 
 ## Creating Requests
 
@@ -49,7 +56,7 @@ struct BasicDataRequest: DataRequest {
 
     typealias Output = Data
 
-    var requestMethod: NetworkRequestMethod {
+    var requestMethod: HTTPRequest.Method {
         .get
     }
 
@@ -68,7 +75,7 @@ struct BasicDataRequest: DataRequest {
     typealias Output = Data
 
     let url: URL?
-    let requestMethod: NetworkRequestMethod
+    let requestMethod: HTTPRequest.Method
 
     func makeURL() throws -> URL {
 		// construct your URL here
@@ -91,7 +98,7 @@ If you're working with JSON, you can also use `DecodableRequest` which requires 
 ```swift
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
-    let requestMethod: NetworkRequestMethod
+    let requestMethod: HTTPRequest.Method
 
     var decoder: JSONDecoder {
         JSONDecoder() // use default or custom decoder
@@ -108,9 +115,10 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 
 `URLBuilder` has been broken out into a separate package `HPURLBuilder` that can be found [here](https://github.com/henrik-dmg/HPURLBuilder)
 
-### Request Authentication
+### Request Authorization
 
-To add authentication to a request, simply supply a `authentication: NetworkRequestAuthentication?` instance to your request. `NetworkRequestAuthentication` is an enum and supports basic authentication with a username and password, bearer token authorisation or a raw option if you want full control.
+To add authorization to a request, simply supply a `authorization: Authorization?` instance to your request.
+You can either use `BasicAuthorization` for basic authentication with a username and password, or `BearerAuthorization` for bearer token authorization or implement you own custom `Authorization` type.
 
 ### Authors
 
