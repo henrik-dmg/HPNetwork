@@ -1,6 +1,6 @@
 import Foundation
 
-/// A type that can schedule and handle network requests
+/// A type that can schedule and handle network requests.
 public protocol NetworkClientProtocol {
 
     func response<Request: NetworkRequest>(
@@ -22,13 +22,13 @@ public protocol NetworkClientProtocol {
 
 }
 
-/// A type that can schedule and handle network requests
+/// A type that can schedule and handle network requests.
 public final class NetworkClient: NetworkClientProtocol {
 
-    /// The `URLSession` instance that will be used to execute network requests
+    /// The `URLSession` instance that will be used to execute network requests.
     private let urlSession: URLSession
-    
-    /// Creates a new network client
+
+    /// Creates a new network client.
     /// - Parameter urlSession: The `URLSession` instance that will be used to execute network requests
     public init(urlSession: URLSession) {
         self.urlSession = urlSession
