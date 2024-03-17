@@ -22,7 +22,7 @@ jobs:
       - name: Run tests
         run: swift test --enable-code-coverage -v
       - name: Convert coverage report
-        run: Scripts/convert-coverage-report --target HPNetworkTests
+        run: Scripts/convert-coverage-report --target HPNetworkPackageTests
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
