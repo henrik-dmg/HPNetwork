@@ -1,7 +1,5 @@
 # HPNetwork
 
-![HPNetwork](/Assets/Banner.png)
-
 ![Swift](https://github.com/henrik-dmg/HPNetwork/workflows/Swift/badge.svg)
 
 `HPNetwork` is a protocol-based networking stack written in pure Swift
