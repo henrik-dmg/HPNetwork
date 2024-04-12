@@ -4,7 +4,7 @@ GIT_ROOT=$(git rev-parse --show-toplevel)
 
 # Check if the pre-commit hook already exists
 if [ -f "$GIT_ROOT/.git/hooks/pre-commit" ]; then
-    rm "$GIT_ROOT/.git/hooks/pre-commit"
+  rm "$GIT_ROOT/.git/hooks/pre-commit"
 fi
 
 ln -s "$GIT_ROOT/Scripts/lint-swift-code" "$GIT_ROOT/.git/hooks/pre-commit"

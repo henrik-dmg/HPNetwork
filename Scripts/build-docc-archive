@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ -z $RUNNER_TEMP ]]; then
+  RUNNER_TEMP=$(git rev-parse --show-toplevel)
+fi
+
+swift package \
+  --allow-writing-to-directory "$RUNNER_TEMP/docs" \
+  generate-documentation \
+  --target HPNetwork \
+  --transform-for-static-hosting \
+  --hosting-base-path HPNetwork \
+  --output-path "$RUNNER_TEMP/docs"
+
+echo "<script>window.location.href += \"documentation/hpnetwork\"</script>" > "$RUNNER_TEMP/docs/index.html"
