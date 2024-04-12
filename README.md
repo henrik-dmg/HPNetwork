@@ -39,6 +39,8 @@ let task = request.schedule { result in
 }
 ```
 
+You can also use pretty much the same API with `NetworkClient` (useful for being able to mock requests in tests).
+
 ## Creating Requests
 
 ### Basics
@@ -116,6 +118,48 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 To add authorization to a request, simply supply a `authorization: Authorization?` instance to your request.
 You can either use `BasicAuthorization` for basic authentication with a username and password, or `BearerAuthorization` for bearer token authorization or implement you own custom `Authorization` type.
 
-### Authors
+## Mocking
+
+There's a new `NetworkClientProtocol` type that you can schedule network requests on. To mock network requests, you can use `NetworkClientMock` from the new `HPNetworkMock` library.
+
+Example usage:
+
+```swift
+networkClient.mockRequest(ofType: SomeRequest.self) { _ in
+    ReturnTypeOfRequest() // or throw an error
+}
+
+// To remove all mocks
+
+networkClient.removeAllMocks()
+```
+
+You can also specify whether `NetworkClientMock` should just fall-back to regular networking if there are no mocks configured for the request it's about the execute by using `fallbackToURLSessionIfNoMatchingMock`
+
+If you need to go deeper, for example if you don't want to migrate to `NetworkClient`, you can use `URLSessionMock` to use with `URLSession`
+
+Example usage of `URLSessionMock`:
+
+```swift
+lazy var mockedURLSession: URLSession = {
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.protocolClasses = [URLSessionMock.self]
+    return URLSession(configuration: configuration)
+}()
+
+// ...
+
+_ = URLSessionMock.mockRequest(to: url, ignoresQuery: false) { _ in
+    let response = HTTPURLResponse(
+        url: url,
+        statusCode: 200,
+        httpVersion: nil,
+        headerFields: ["Content-Type": ContentType.applicationJSON.rawValue]
+    )!
+    return (someDataYouWant, response)
+}
+```
+
+## Authors
 
 -   Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
