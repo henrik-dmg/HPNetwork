@@ -57,8 +57,8 @@ struct BasicDataRequest: DataRequest {
     }
 
     func makeURL() throws -> URL {
-		// construct your URL here
-	}
+        // construct your URL here
+    }
 
 }
 ```
@@ -74,8 +74,8 @@ struct BasicDataRequest: DataRequest {
     let requestMethod: HTTPRequest.Method
 
     func makeURL() throws -> URL {
-		// construct your URL here
-	}
+        // construct your URL here
+    }
 
 }
 
@@ -101,8 +101,8 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
     }
 
     func makeURL() throws -> URL {
-		// construct your URL here
-	}
+        // construct your URL here
+    }
 
 }
 ```
@@ -118,4 +118,4 @@ You can either use `BasicAuthorization` for basic authentication with a username
 
 ### Authors
 
-- Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
+-   Henrik Panhans ([@henrik_dmg](https://twitter.com/henrik_dmg))
