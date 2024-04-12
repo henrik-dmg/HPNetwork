@@ -3,6 +3,10 @@ name: Documentation
 on:
   push:
     branches: ["main"]
+    paths:
+      - "Sources/**/*.swift"
+      - "Tests/**/*.swift"
+      - "**/*.md"
 
 jobs:
   deploy-pages:
