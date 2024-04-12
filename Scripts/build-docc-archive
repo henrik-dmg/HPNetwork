@@ -5,16 +5,13 @@ if [[ -z $RUNNER_TEMP ]]; then
   RUNNER_TEMP=$(git rev-parse --show-toplevel)
 fi
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
-
 # First, insert docc-plugin dependency. This is very hacky, but it avoids everyone having to pull in the docc-plugin when they use this library.
-PACKAGE_FILE="$GIT_ROOT/Package.swift"
 
 sed '/swift-http-types.git/a\
 .package(url: "https://github.com/apple/swift-docc-plugin", branch: "main"),\
-' $PACKAGE_FILE > "$RUNNER_TEMP/Package.tmp"
+' "Package.swift" > "Package.tmp"
 
-mv "$GIT_ROOT/Package.tmp" $PACKAGE_FILE
+mv "Package.tmp" "Package.swift"
 
 swift package \
   --allow-writing-to-directory "$RUNNER_TEMP/docs" \
@@ -28,5 +25,5 @@ echo "<script>window.location.href += \"documentation/hpnetwork\"</script>" > "$
 
 if [[ -z $GITHUB_ACTIONS ]]; then
   echo "Restoring Package.swift to original state."
-  sed -i '' '/swift-docc-plugin/d' $PACKAGE_FILE
+  sed -i '' '/swift-docc-plugin/d' "Package.swift"
 fi
