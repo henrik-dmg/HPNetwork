@@ -4,7 +4,7 @@ swift-format format \
   --recursive \
   --parallel \
   --in-place \
-  --configuration .swift-format.json \
+  --configuration config/swift-format.json \
   Sources/ \
   Tests/ \
   Package.swift

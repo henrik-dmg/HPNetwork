@@ -4,7 +4,7 @@ swift-format lint \
   --recursive \
   --parallel \
   --strict \
-  --configuration .swift-format.json \
+  --configuration config/swift-format.json \
   Sources/ \
   Tests/ \
   Package.swift

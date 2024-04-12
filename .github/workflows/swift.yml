@@ -66,4 +66,4 @@ jobs:
       - name: Lint code
         run: Scripts/lint-swift-code
       - name: Scan for dead code
-        run: periphery scan --strict
+        run: periphery scan --strict --config config/periphery.yml
