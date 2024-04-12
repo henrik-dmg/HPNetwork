@@ -3,10 +3,14 @@ name: Swift
 on:
   push:
     branches: [main]
-    paths: ["Sources/**/*.swift", "Tests/**/*.swift"]
+    paths:
+      - "Sources/**/*.swift"
+      - "Tests/**/*.swift"
   pull_request:
     branches: [main]
-    paths: ["Sources/**/*.swift", "Tests/**/*.swift"]
+    paths:
+      - "Sources/**/*.swift"
+      - "Tests/**/*.swift"
 
 jobs:
   test-swift:

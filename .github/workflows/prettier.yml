@@ -3,10 +3,16 @@ name: Prettier
 on:
   push:
     branches: ["main"]
-    paths: ["**/*.{js,md,yml}"]
+    paths:
+      - "**/*.js"
+      - "**/*.yml"
+      - "**/*.md"
   pull_request:
     branches: [main]
-    paths: ["**/*.{js,md,yml}"]
+    paths:
+      - "**/*.js"
+      - "**/*.yml"
+      - "**/*.md"
 
 jobs:
   prettier:
