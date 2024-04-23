@@ -79,8 +79,10 @@ public final class NetworkClientMock: NetworkClientProtocol {
         mockedRequests.removeAll()
     }
 
-    public func mockRequest<Request: NetworkRequest>(ofType type: Request.Type, handler: @escaping (Request) async throws -> Request.Output)
-    {
+    public func mockRequest<Request: NetworkRequest>(
+        ofType type: Request.Type,
+        handler: @escaping (Request) async throws -> Request.Output
+    ) {
         let typeName = String(describing: type.self)
         mockedRequests[typeName] = ConcreteMockedRequest(handler: handler)
     }

@@ -22,9 +22,14 @@ extension DownloadRequest {
         let request = try makeRequest()
         let startTime = DispatchTime.now()
 
-        let (url, response) = try await urlSession.download(for: request, delegate: delegate)
+        // Check for cancellation
+        try Task.checkCancellation()
 
+        let (url, response) = try await urlSession.download(for: request, delegate: delegate)
         let networkingEndTime = DispatchTime.now()
+
+        // Check for cancellation
+        try Task.checkCancellation()
 
         guard let httpResponse = (response as? HTTPURLResponse)?.httpResponse else {
             throw NetworkRequestConversionError.failedToConvertURLResponseToHTTPResponse
