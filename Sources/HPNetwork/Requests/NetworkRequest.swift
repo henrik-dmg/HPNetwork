@@ -23,7 +23,7 @@ public protocol NetworkRequest<Output> {
 
     /// The authorization method used to authorize the network request.
     ///
-    /// An instance of ``AuthorizationHeaderField`` will be created from this and appended to the other provided header fields. Defaults to `nil`
+    /// An instance of ``HTTPField`` will be created from this and appended to the other provided header fields. Defaults to `nil`
     var authorization: Authorization? { get }
 
     /// A method used to construct or create the URL of the network request.

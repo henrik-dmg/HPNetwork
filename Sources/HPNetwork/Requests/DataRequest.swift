@@ -5,15 +5,46 @@ import HTTPTypesFoundation
 /// A protocol that's used to handle regular network request where data is downloaded.
 public protocol DataRequest<Output>: NetworkRequest {
 
-    /// Called by ``response(delegate:)``, ``schedule(delegate:completion:)`` or ``result(delegate:)`` once the networking has finished.
-    ///
+    /// Use this method to conver the `Data` returned by the networking to your desired `Output` type.
     /// For more convenient handling of `Decodable` output types, use ``DecodableRequest``
+    ///
+    /// Called by ``response(urlSession:delegate:)``,  ``result(urlSession:delegate:)``
+    /// or ``schedule(urlSession:delegate:finishingQueue:completion:)`` once the networking has finished.
     /// - Parameters:
-    ///  - data: The raw data returned by the networking
-    ///  - response: The network response
+    ///   - data: The raw data returned by the networking
+    ///   - response: The network response
     /// - Returns: An instance of the specified output type
     /// - Throws: When converting the data to the desired output type failed
     func convertResponse(data: Data, response: HTTPResponse) throws -> Output
+
+    /// Executes the request and returns the response.
+    /// - Parameters:
+    ///   - urlSession: The `URLSession` instance to use to execute the request
+    ///   - delegate: The delegate to use
+    /// - Returns: The network response containing the converted output along with some metadata
+    /// - Throws: If the networking failed or converting the response to the desired output type failed
+    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
+
+    /// Executes the request and returns the result.
+    /// - Parameters:
+    ///   - urlSession: The `URLSession` instance to use to execute the request
+    ///   - delegate: The delegate to use
+    /// - Returns: The result of the network request
+    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> RequestResult
+
+    /// Executes the request and calls the completion handler with the result.
+    /// - Parameters:
+    ///   - urlSession: The `URLSession` instance to use to execute the request
+    ///   - delegate: The delegate to use
+    ///   - finishingQueue: The `DispatchQueue` that the `completion` will be called on
+    ///   - completion: The completion handler
+    /// - Returns: A cancellable `Task` instance
+    func schedule(
+        urlSession: URLSession,
+        delegate: (any URLSessionTaskDelegate)?,
+        finishingQueue: DispatchQueue,
+        completion: @escaping (RequestResult) -> Void
+    ) -> Task<Void, Never>
 
 }
 
@@ -29,8 +60,12 @@ extension DataRequest {
         let request = try makeRequest()
         // Keep track of start time
         let startTime = DispatchTime.now()
+        // Check for cancellation
+        try Task.checkCancellation()
         // Actually execute network request
         let (data, response) = try await urlSession.data(for: request, delegate: delegate)
+        // Check for cancellation
+        try Task.checkCancellation()
         // Keep track of networking duration
         let networkingEndTime = DispatchTime.now()
         // Convert response
