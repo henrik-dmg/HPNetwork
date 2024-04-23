@@ -16,22 +16,23 @@ public protocol DataRequest<Output>: NetworkRequest {
     /// - Returns: An instance of the specified output type
     /// - Throws: When converting the data to the desired output type failed
     func convertResponse(data: Data, response: HTTPResponse) throws -> Output
-    
-    /// Executes the request and returns the response
+
+    /// Executes the request and returns the response.
     /// - Parameters:
     ///   - urlSession: The `URLSession` instance to use to execute the request
     ///   - delegate: The delegate to use
     /// - Returns: The network response containing the converted output along with some metadata
+    /// - Throws: If the networking failed or converting the response to the desired output type failed
     func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
 
-    /// Executes the request and returns the result
+    /// Executes the request and returns the result.
     /// - Parameters:
     ///   - urlSession: The `URLSession` instance to use to execute the request
     ///   - delegate: The delegate to use
     /// - Returns: The result of the network request
     func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> RequestResult
 
-    /// Executes the request and calls the completion handler with the result
+    /// Executes the request and calls the completion handler with the result.
     /// - Parameters:
     ///   - urlSession: The `URLSession` instance to use to execute the request
     ///   - delegate: The delegate to use
