@@ -6,6 +6,8 @@ import XCTest
 
 public enum URLSessionMockError: Error {
     case cantCreateURL
+    case noURL
+    case noMockedRequest
 }
 
 public final class URLSessionMock: URLProtocol {
@@ -85,10 +87,12 @@ public final class URLSessionMock: URLProtocol {
     public override func startLoading() {
         guard let url = request.url else {
             XCTFail("URLRequest has no URL")
+            client?.urlProtocol(self, didFailWithError: URLSessionMockError.noURL)
             return
         }
         guard let mockedRequest = Self.mockedRequest(for: url) else {
             XCTFail("No mocked request configured for url \"\(url.absoluteString)\"")
+            client?.urlProtocol(self, didFailWithError: URLSessionMockError.noMockedRequest)
             return
         }
 
