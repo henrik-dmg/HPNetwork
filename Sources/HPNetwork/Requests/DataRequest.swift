@@ -13,9 +13,10 @@ public protocol DataRequest<Output>: NetworkRequest {
     /// - Parameters:
     ///   - data: The raw data returned by the networking
     ///   - response: The network response
+    ///   - url: The URL that handled the request
     /// - Returns: An instance of the specified output type
     /// - Throws: When converting the data to the desired output type failed
-    func convertResponse(data: Data, response: HTTPResponse) throws -> Output
+    func convertResponse(data: Data, response: HTTPResponse, url: URL) throws -> Output
 
     /// Executes the request and returns the response.
     /// - Parameters:
@@ -69,12 +70,16 @@ extension DataRequest {
         // Keep track of networking duration
         let networkingEndTime = DispatchTime.now()
         // Convert response
-        guard let httpResponse = (response as? HTTPURLResponse)?.httpResponse else {
+        guard
+            let httpURLResponse = response as? HTTPURLResponse,
+            let httpResponse = httpURLResponse.httpResponse,
+            let url = httpURLResponse.url
+        else {
             throw NetworkRequestConversionError.failedToConvertURLResponseToHTTPResponse
         }
         // Validate response and convert output
         try validateResponse(httpResponse)
-        let convertedResult = try convertResponse(data: data, response: httpResponse)
+        let convertedResult = try convertResponse(data: data, response: httpResponse, url: url)
         // Calculate total elapsed times
         let elapsedTime = calculateElapsedTime(
             startTime: startTime,
@@ -84,6 +89,7 @@ extension DataRequest {
         // Return a NetworkResponse
         return NetworkResponse(
             output: convertedResult,
+            url: url,
             response: httpResponse,
             networkingDuration: elapsedTime.0,
             processingDuration: elapsedTime.1
@@ -127,9 +133,10 @@ extension DataRequest where Output == Data {
     /// - Parameters:
     ///  - data: The raw data returned by the networking
     ///  - response: The network response
+    ///  - url: The URL that handled the request
     /// - Returns: The raw data returned by the networking
     /// - Throws: Doesn't throw, because the input `data` is simply forwarded
-    public func convertResponse(data: Data, response: HTTPResponse) throws -> Output {
+    public func convertResponse(data: Data, response: HTTPResponse, url: URL) throws -> Output {
         data
     }
 

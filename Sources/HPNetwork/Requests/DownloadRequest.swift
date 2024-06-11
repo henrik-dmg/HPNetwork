@@ -31,7 +31,11 @@ extension DownloadRequest {
         // Check for cancellation
         try Task.checkCancellation()
 
-        guard let httpResponse = (response as? HTTPURLResponse)?.httpResponse else {
+        guard
+            let httpURLResponse = response as? HTTPURLResponse,
+            let httpResponse = httpURLResponse.httpResponse,
+            let httpURL = httpURLResponse.url
+        else {
             throw NetworkRequestConversionError.failedToConvertURLResponseToHTTPResponse
         }
 
@@ -47,6 +51,7 @@ extension DownloadRequest {
         )
         return NetworkResponse(
             output: convertedResult,
+            url: httpURL,
             response: httpResponse,
             networkingDuration: elapsedTime.0,
             processingDuration: elapsedTime.1

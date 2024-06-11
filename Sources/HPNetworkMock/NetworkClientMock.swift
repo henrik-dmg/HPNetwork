@@ -39,8 +39,10 @@ public final class NetworkClientMock: NetworkClientProtocol {
             throw NetworkClientMockError.noMockConfiguredForRequest
         }
         let output = try await mockedRequest.handler(request)
+        // swift-format-ignore
         return NetworkResponse(
             output: output,
+            url: URL(string: "https://apple.com")!,
             response: HTTPResponse(status: .ok, headerFields: HTTPFields()),
             networkingDuration: 0.00,
             processingDuration: 0.00
