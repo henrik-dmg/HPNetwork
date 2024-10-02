@@ -6,11 +6,16 @@ on:
     paths:
       - "Sources/**/*.swift"
       - "Tests/**/*.swift"
+      - "Package.swift"
+      - "Package.resolved"
   pull_request:
     branches: [main]
     paths:
       - "Sources/**/*.swift"
       - "Tests/**/*.swift"
+      - "Package.swift"
+      - "Package.resolved"
+  workflow_dispatch:
 
 jobs:
   test-swift:
