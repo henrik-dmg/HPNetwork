@@ -52,7 +52,7 @@ public final class NetworkClientMock: NetworkClientProtocol {
     public func result<Request: NetworkRequest>(
         _ request: Request,
         delegate: (any URLSessionTaskDelegate)? = nil
-    ) async -> Request.RequestResult {
+    ) async -> Request.NetworkResult {
         do {
             let response = try await response(request, delegate: delegate)
             return .success(response)
@@ -63,15 +63,10 @@ public final class NetworkClientMock: NetworkClientProtocol {
 
     public func schedule<Request: NetworkRequest>(
         _ request: Request,
-        delegate: (any URLSessionTaskDelegate)? = nil,
-        finishingQueue: DispatchQueue = .main,
-        completion: @escaping (Request.RequestResult) -> Void
-    ) -> Task<Void, Never> {
-        Task {
-            let result = await result(request, delegate: delegate)
-            finishingQueue.async {
-                completion(result)
-            }
+        delegate: (any URLSessionTaskDelegate)?
+    ) -> Request.NetworkTask where Request.Output: Sendable {
+        Request.NetworkTask {
+            try await response(request, delegate: delegate)
         }
     }
 
@@ -89,7 +84,9 @@ public final class NetworkClientMock: NetworkClientProtocol {
         mockedRequests[typeName] = ConcreteMockedRequest(handler: handler)
     }
 
-    private func mockedRequest<Request: NetworkRequest>(forType type: Request.Type) -> ConcreteMockedRequest<Request>? {
+    private func mockedRequest<Request: NetworkRequest>(forType type: Request.Type)
+        -> ConcreteMockedRequest<Request>?
+    {
         let typeName = String(describing: type.self)
         return mockedRequests[typeName] as? ConcreteMockedRequest<Request>
     }

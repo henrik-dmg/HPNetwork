@@ -31,7 +31,7 @@ public protocol DataRequest<Output>: NetworkRequest {
     ///   - urlSession: The `URLSession` instance to use to execute the request
     ///   - delegate: The delegate to use
     /// - Returns: The result of the network request
-    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> RequestResult
+    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> NetworkResult
 
     /// Executes the request and calls the completion handler with the result.
     /// - Parameters:
@@ -42,10 +42,8 @@ public protocol DataRequest<Output>: NetworkRequest {
     /// - Returns: A cancellable `Task` instance
     func schedule(
         urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?,
-        finishingQueue: DispatchQueue,
-        completion: @escaping (RequestResult) -> Void
-    ) -> Task<Void, Never>
+        delegate: (any URLSessionTaskDelegate)?
+    ) -> NetworkTask
 
 }
 
@@ -99,7 +97,7 @@ extension DataRequest {
     @discardableResult public func result(
         urlSession: URLSession,
         delegate: (any URLSessionTaskDelegate)?
-    ) async -> RequestResult {
+    ) async -> NetworkResult {
         do {
             let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
@@ -110,15 +108,10 @@ extension DataRequest {
 
     @discardableResult public func schedule(
         urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?,
-        finishingQueue: DispatchQueue = .main,
-        completion: @escaping (RequestResult) -> Void
-    ) -> Task<Void, Never> {
-        Task {
-            let result = await result(urlSession: urlSession, delegate: delegate)
-            finishingQueue.async {
-                completion(result)
-            }
+        delegate: (any URLSessionTaskDelegate)?
+    ) -> NetworkTask where Output: Sendable {
+        NetworkTask {
+            try await response(urlSession: urlSession, delegate: delegate)
         }
     }
 

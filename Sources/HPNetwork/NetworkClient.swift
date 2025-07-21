@@ -11,14 +11,12 @@ public protocol NetworkClientProtocol {
     func result<Request: NetworkRequest>(
         _ request: Request,
         delegate: (any URLSessionTaskDelegate)?
-    ) async -> Request.RequestResult
+    ) async -> Request.NetworkResult
 
     func schedule<Request: NetworkRequest>(
         _ request: Request,
-        delegate: (any URLSessionTaskDelegate)?,
-        finishingQueue: DispatchQueue,
-        completion: @escaping (Request.RequestResult) -> Void
-    ) -> Task<Void, Never>
+        delegate: (any URLSessionTaskDelegate)?
+    ) -> Request.NetworkTask
 
 }
 
@@ -44,17 +42,15 @@ public final class NetworkClient: NetworkClientProtocol {
     public func result<Request: NetworkRequest>(
         _ request: Request,
         delegate: (any URLSessionTaskDelegate)? = nil
-    ) async -> Request.RequestResult {
+    ) async -> Request.NetworkResult {
         await request.result(urlSession: urlSession, delegate: delegate)
     }
 
-    public func schedule<Request>(
+    public func schedule<Request: NetworkRequest>(
         _ request: Request,
         delegate: (any URLSessionTaskDelegate)? = nil,
-        finishingQueue: DispatchQueue = .main,
-        completion: @escaping (Request.RequestResult) -> Void
-    ) -> Task<Void, Never> where Request: NetworkRequest {
-        request.schedule(urlSession: urlSession, delegate: delegate, finishingQueue: finishingQueue, completion: completion)
+    ) -> Request.NetworkTask where Request.Output: Sendable {
+        request.schedule(urlSession: urlSession, delegate: delegate)
     }
 
 }

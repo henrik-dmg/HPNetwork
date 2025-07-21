@@ -5,13 +5,16 @@ import HTTPTypesFoundation
 // MARK: - NetworkRequest
 
 /// A base protocol to define network requests.
-public protocol NetworkRequest<Output> {
+public protocol NetworkRequest<Output>: Sendable {
 
     /// The expected output type returned in the network request.
     associatedtype Output
 
     /// The result of a network request.
-    typealias RequestResult = Result<NetworkResponse<Output>, Error>
+    typealias NetworkResult = Result<NetworkResponse<Output>, Error>
+
+    /// A typed task of a network request.
+    typealias NetworkTask = Task<NetworkResponse<Output>, Error>
 
     /// The header fields that will be send with the network request.
     ///
@@ -50,7 +53,7 @@ public protocol NetworkRequest<Output> {
     ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
     /// both networking and processing in seconds or an error
-    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> RequestResult
+    func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> NetworkResult
 
     /// Uses all the provided information to create a `URLRequest` and schedules that request.
     /// - Parameters:
@@ -61,10 +64,8 @@ public protocol NetworkRequest<Output> {
     /// - Returns: A task that wraps the running network request
     func schedule(
         urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?,
-        finishingQueue: DispatchQueue,
-        completion: @escaping (RequestResult) -> Void
-    ) -> Task<Void, Never>
+        delegate: (any URLSessionTaskDelegate)?
+    ) -> NetworkTask
 
     /// A method that can be used to validate the response of a network request before any further processing will be attempted.
     ///
@@ -154,7 +155,7 @@ extension NetworkRequest {
     /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
     /// both networking and processing in seconds or an error
-    public func result(urlSession: URLSession) async -> RequestResult {
+    public func result(urlSession: URLSession) async -> NetworkResult {
         await result(urlSession: urlSession, delegate: nil)
     }
 
@@ -164,12 +165,8 @@ extension NetworkRequest {
     ///   - finishingQueue: The `DispatchQueue` that the completion handler will be called on
     ///   - completion: The block that will be executed with the result of the network request
     /// - Returns: A task that wraps the running network request
-    public func schedule(
-        urlSession: URLSession,
-        finishingQueue: DispatchQueue = .main,
-        completion: @escaping (RequestResult) -> Void
-    ) -> Task<Void, Never> {
-        schedule(urlSession: urlSession, delegate: nil, finishingQueue: finishingQueue, completion: completion)
+    public func schedule(urlSession: URLSession) -> NetworkTask {
+        schedule(urlSession: urlSession, delegate: nil)
     }
 
 }

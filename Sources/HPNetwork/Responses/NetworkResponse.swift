@@ -37,3 +37,5 @@ public struct NetworkResponse<Output> {
     }
 
 }
+
+extension NetworkResponse: Sendable where Output: Sendable {}

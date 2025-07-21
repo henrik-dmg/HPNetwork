@@ -61,7 +61,7 @@ extension DownloadRequest {
     @discardableResult public func result(
         urlSession: URLSession,
         delegate: (any URLSessionTaskDelegate)?
-    ) async -> RequestResult {
+    ) async -> NetworkResult {
         do {
             let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
@@ -73,14 +73,9 @@ extension DownloadRequest {
     public func schedule(
         urlSession: URLSession,
         delegate: (any URLSessionTaskDelegate)?,
-        finishingQueue: DispatchQueue = .main,
-        completion: @escaping (RequestResult) -> Void
-    ) -> Task<Void, Never> {
-        Task {
-            let result = await result(urlSession: urlSession, delegate: delegate)
-            finishingQueue.async {
-                completion(result)
-            }
+    ) -> NetworkTask where Output: Sendable {
+        NetworkTask {
+            try await response(urlSession: urlSession, delegate: delegate)
         }
     }
 
