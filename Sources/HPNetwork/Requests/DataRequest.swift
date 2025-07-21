@@ -37,13 +37,8 @@ public protocol DataRequest<Output>: NetworkRequest {
     /// - Parameters:
     ///   - urlSession: The `URLSession` instance to use to execute the request
     ///   - delegate: The delegate to use
-    ///   - finishingQueue: The `DispatchQueue` that the `completion` will be called on
-    ///   - completion: The completion handler
     /// - Returns: A cancellable `Task` instance
-    func schedule(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?
-    ) -> NetworkTask
+    func schedule(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) -> NetworkTask
 
 }
 

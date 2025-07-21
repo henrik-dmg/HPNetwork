@@ -3,6 +3,7 @@ import XCTest
 @testable import HPNetwork
 @testable import HPNetworkMock
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class DataRequestTests: XCTestCase {
 
     // MARK: - Properties
@@ -43,23 +44,14 @@ final class DataRequestTests: XCTestCase {
         mockNetworkRequest(url: url, dataToReturn: "{}".data(using: .utf8))
 
         let request = BasicDecodableRequest<EmptyStruct>(url: url)
-        let expection = XCTestExpectation(description: "Networking finished")
-        _ = networkClient.schedule(request) { result in
-            expection.fulfill()
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response.output, EmptyStruct())
-            case .failure(let error):
-                XCTFail(error.localizedDescription)
-            }
-        }
-        await fulfillment(of: [expection], timeout: 10)
+        let response = try await networkClient.schedule(request).value
+        XCTAssertEqual(response.output, EmptyStruct())
     }
 
     // MARK: - Helpers
 
     private func mockNetworkRequest(url: URL, dataToReturn data: Data?) {
-        _ = URLSessionMock.mockRequest(to: url, ignoresQuery: false) { _ in
+        MockedRequestStore.shared.mockRequest(to: url, ignoresQuery: false) { _ in
             let response = HTTPURLResponse(
                 url: url,
                 statusCode: 200,

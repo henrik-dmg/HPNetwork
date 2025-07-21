@@ -59,8 +59,6 @@ public protocol NetworkRequest<Output>: Sendable {
     /// - Parameters:
     ///   - urlSession: The `URLSession` instance to use to execute this network request
     ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
-    ///   - finishingQueue: The `DispatchQueue` that the completion handler will be called on
-    ///   - completion: The block that will be executed with the result of the network request
     /// - Returns: A task that wraps the running network request
     func schedule(
         urlSession: URLSession,
@@ -160,10 +158,7 @@ extension NetworkRequest {
     }
 
     /// Uses all the provided information to create a `URLRequest` and schedules that request.
-    /// - Parameters:
-    ///   - urlSession: The `URLSession` instance to use to execute this network request
-    ///   - finishingQueue: The `DispatchQueue` that the completion handler will be called on
-    ///   - completion: The block that will be executed with the result of the network request
+    /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: A task that wraps the running network request
     public func schedule(urlSession: URLSession) -> NetworkTask {
         schedule(urlSession: urlSession, delegate: nil)

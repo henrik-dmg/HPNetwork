@@ -3,6 +3,7 @@ import XCTest
 @testable import HPNetwork
 @testable import HPNetworkMock
 
+@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
 final class DownloadRequestTests: XCTestCase {
 
     // MARK: - Properties
@@ -57,29 +58,15 @@ final class DownloadRequestTests: XCTestCase {
         mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
 
         let request = BasicDownloadRequest(url: url)
-        let expection = XCTestExpectation(description: "Networking finished")
-        _ = networkClient.schedule(request) { [weak self] result in
-            expection.fulfill()
-            switch result {
-            case .success(let response):
-                self?.fileURL = response.output
-                do {
-                    let downloadedContents = try String(contentsOf: response.output)
-                    XCTAssertEqual(downloadedContents, self?.jsonString)
-                } catch {
-                    XCTFail(error.localizedDescription)
-                }
-            case .failure(let error):
-                XCTFail(error.localizedDescription)
-            }
-        }
-        await fulfillment(of: [expection], timeout: 10)
+        let response = try await networkClient.schedule(request).value
+        let downloadedContents = try String(contentsOf: response.output)
+        XCTAssertEqual(downloadedContents, jsonString)
     }
 
     // MARK: - Helpers
 
     private func mockNetworkRequest(url: URL, dataToReturn data: Data?) {
-        _ = URLSessionMock.mockRequest(to: url, ignoresQuery: false) { _ in
+        MockedRequestStore.shared.mockRequest(to: url, ignoresQuery: false) { _ in
             let response = HTTPURLResponse(
                 url: url,
                 statusCode: 200,
