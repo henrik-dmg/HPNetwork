@@ -48,7 +48,7 @@ public final class NetworkClient: NetworkClientProtocol {
 
     public func schedule<Request: NetworkRequest>(
         _ request: Request,
-        delegate: (any URLSessionTaskDelegate)? = nil,
+        delegate: (any URLSessionTaskDelegate)? = nil
     ) -> Request.NetworkTask where Request.Output: Sendable {
         request.schedule(urlSession: urlSession, delegate: delegate)
     }

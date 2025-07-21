@@ -70,10 +70,7 @@ extension DownloadRequest {
         }
     }
 
-    public func schedule(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?,
-    ) -> NetworkTask where Output: Sendable {
+    public func schedule(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) -> NetworkTask where Output: Sendable {
         NetworkTask {
             try await response(urlSession: urlSession, delegate: delegate)
         }
