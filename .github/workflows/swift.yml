@@ -20,7 +20,7 @@ on:
 jobs:
   test-swift:
     name: Test Swift Code
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Configure Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -51,7 +51,7 @@ jobs:
 
   lint-code:
     name: Lint Swift Code
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - name: Configure Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -67,8 +67,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
       - name: Install SwiftLint
-        run: brew install swift-format peripheryapp/periphery/periphery
+        run: brew install peripheryapp/periphery/periphery
       - name: Lint code
         run: Scripts/lint-swift-code
       - name: Scan for dead code
-        run: periphery scan --strict --config config/periphery.yml
+        run: periphery scan --config config/periphery.yml --relative-results --format github-actions

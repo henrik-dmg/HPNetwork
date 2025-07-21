@@ -1,7 +1,6 @@
 import XCTest
 
 @testable import HPNetwork
-@testable import HPNetworkMock
 
 final class HTTPFieldBuilderTests: XCTestCase {
 

@@ -1,5 +1,4 @@
 import Foundation
-import HPNetwork
 import HTTPTypes
 import HTTPTypesFoundation
 import Synchronization
