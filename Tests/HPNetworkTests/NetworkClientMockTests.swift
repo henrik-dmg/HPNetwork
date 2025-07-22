@@ -111,9 +111,7 @@ class NetworkClientMockTests: XCTestCase {
     // MARK: - Helpers
 
     private func makeNetworkClient() async -> NetworkClientMock {
-        let client = NetworkClientMock()
-        await client.setFallbackToURLSessionIfNoMatchingMock(false)
-        return client
+        NetworkClientMock(urlSession: .shared, fallbackToURLSessionIfNoMatchingMock: false)
     }
 
 }
