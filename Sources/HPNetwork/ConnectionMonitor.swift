@@ -1,7 +1,8 @@
 import Foundation
 import Network
 
-public final class ConnectionMonitor: ObservableObject, @unchecked Sendable {
+@MainActor
+public final class ConnectionMonitor: ObservableObject {
 
     // MARK: - Properties
 
@@ -32,7 +33,9 @@ public final class ConnectionMonitor: ObservableObject, @unchecked Sendable {
         self.pathMonitor = pathMonitor
 
         self.pathMonitor.pathUpdateHandler = { [weak self] path in
-            self?.emitNotification(path)
+            Task { [weak self] in
+                await self?.emitNotification(path)
+            }
         }
         self.pathMonitor.start(queue: queue)
     }
@@ -42,9 +45,7 @@ public final class ConnectionMonitor: ObservableObject, @unchecked Sendable {
     private func emitNotification(_ path: NWPath) {
         let userInfo = [ConnectionMonitor.updatedPathKey: path]
 
-        Task { [weak self] in
-            await self?.updateState(path)
-        }
+        currentPath = path
 
         switch path.status {
         case .satisfied:
@@ -68,11 +69,6 @@ public final class ConnectionMonitor: ObservableObject, @unchecked Sendable {
         @unknown default:
             break
         }
-    }
-
-    @MainActor
-    private func updateState(_ path: NWPath) {
-        currentPath = path
     }
 
 }
