@@ -9,12 +9,17 @@ class NetworkClientMockTests: XCTestCase {
 
     let url = URL(string: "https://ipapi.co/json")!
 
+    override func setUp() async throws {
+        try await super.setUp()
+        await NetworkRequestMockStore.shared.removeAllMocks()
+    }
+
     // MARK: - Tests
 
     func testBasicRequest_Async_Mocked() async throws {
         let networkClient = await makeNetworkClient()
 
-        await networkClient.mockRequest(ofType: BasicDecodableRequest<Int>.self) { _ in
+        await NetworkRequestMockStore.shared.mockRequests(for: BasicDecodableRequest<Int>.self) { _ in
             32
         }
 
@@ -38,7 +43,7 @@ class NetworkClientMockTests: XCTestCase {
     func testBasicRequest_Result_Mocked() async throws {
         let networkClient = await makeNetworkClient()
 
-        await networkClient.mockRequest(ofType: BasicDecodableRequest<Int>.self) { _ in
+        await NetworkRequestMockStore.shared.mockRequests(for: BasicDecodableRequest<Int>.self) { _ in
             32
         }
 
@@ -66,7 +71,7 @@ class NetworkClientMockTests: XCTestCase {
     func testBasicRequest_Completion_Mocked() async throws {
         let networkClient = await makeNetworkClient()
 
-        await networkClient.mockRequest(ofType: BasicDecodableRequest<Int>.self) { _ in
+        await NetworkRequestMockStore.shared.mockRequests(for: BasicDecodableRequest<Int>.self) { _ in
             32
         }
 
@@ -90,7 +95,7 @@ class NetworkClientMockTests: XCTestCase {
     func testNetworkClientMock_RemovesAllMocks() async throws {
         let networkClient = await makeNetworkClient()
 
-        await networkClient.mockRequest(ofType: BasicDecodableRequest<Int>.self) { _ in
+        await NetworkRequestMockStore.shared.mockRequests(for: BasicDecodableRequest<Int>.self) { _ in
             32
         }
 
@@ -98,7 +103,7 @@ class NetworkClientMockTests: XCTestCase {
         let response = try await networkClient.response(request, delegate: nil)
         XCTAssertEqual(response.output, 32)
 
-        await networkClient.removeAllMocks()
+        await NetworkRequestMockStore.shared.removeAllMocks()
 
         do {
             _ = try await networkClient.response(request, delegate: nil)

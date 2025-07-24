@@ -31,24 +31,19 @@ public final class URLSessionMock: URLProtocol {
     }
 
     public override func startLoading() {
-        guard let url = request.url else {
-            XCTFail("URLRequest has no URL")
-            client?.urlProtocol(self, didFailWithError: URLSessionMockError.noURL)
-            return
-        }
-        guard let mockedRequest = MockedRequestStore.shared.mockedRequest(for: url) else {
-            XCTFail("No mocked request configured for url \"\(url.absoluteString)\"")
+        guard let mockedRequest = URLRequestMockStore.shared.mockedRequest(for: request) else {
+            XCTFail("No mocked request configured for url \"\(request)\"")
             client?.urlProtocol(self, didFailWithError: URLSessionMockError.noMockedRequest)
             return
         }
 
         do {
-            let (data, response) = try mockedRequest.handler(request)
+            let (data, response) = try mockedRequest.transform(request)
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)
         } catch {
-            XCTFail("No response returned for url \"\(url.absoluteString)\"")
+            XCTFail("No response returned for url \"\(request)\"")
         }
     }
 

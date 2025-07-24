@@ -8,9 +8,9 @@ A flexible, protocol-based networking stack written in Swift.
 
 ## Installation
 
-Starting with v4 HPNetwork is only available via Swift Package Manager.
+`HPNetwork` is available via Swift Package Manager:
 
-- Package.swift: `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "4.0.0")`
+- Package.swift: `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "5.0.0")`
 - Xcode: `https://github.com/henrik-dmg/HPNetwork`
 
 ## Scheduling Requests
@@ -21,7 +21,7 @@ Scheduling a request is as easy as this:
 let response = try await request.response()
 ```
 
-The `response` is a ``NetworkResponse`` containing the output and statisticsof the request.
+The `response` is a ``NetworkResponse`` containing the output and statistics of the request.
 
 You can also get an async result:
 
@@ -42,7 +42,7 @@ let task = request.schedule { result in
 }
 ```
 
-You can also use pretty much the same API with ``NetworkClient`` (useful for being able to mock requests in tests).
+You can also use pretty much use the same API with ``NetworkClient`` (useful for being able to mock requests in tests).
 
 ## Creating Requests
 
@@ -56,15 +56,15 @@ In the most simple terms, that means you supply a `URL` and a request method.
 ```swift
 struct BasicDataRequest: DataRequest {
 
-typealias Output = Data
+    typealias Output = Data
 
-var requestMethod: HTTPRequest.Method {
-    .get
-}
+    var requestMethod: HTTPRequest.Method {
+        .get
+    }
 
-func makeURL() throws -> URL {
-    // construct your URL here
-}
+    func makeURL() throws -> URL {
+        // construct your URL here
+    }
 
 }
 ```
@@ -86,8 +86,8 @@ struct BasicDataRequest: DataRequest {
 }
 
 let basicRequest = BasicDataRequest(
-url: URL(string: "https://panhans.dev/"),
-requestMethod: .get
+    url: URL(string: "https://panhans.dev/"),
+    requestMethod: .get
 )
 ```
 
@@ -120,4 +120,5 @@ struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 ### Request Authorization
 
 To add authorization to a request, simply supply a ``Authorization`` instance to your request.
-You can either use ``BasicAuthorization`` for basic authentication with a username and password, or ``BearerAuthorization`` for bearer token authorization or implement you own custom ``Authorization`` type.
+You can either use ``BasicAuthorization`` for basic authentication with a username and password,
+or ``BearerAuthorization`` for bearer token authorization or implement you own custom ``Authorization`` type.

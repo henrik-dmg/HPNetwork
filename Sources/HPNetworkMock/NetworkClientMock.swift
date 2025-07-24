@@ -27,9 +27,6 @@ public final class NetworkClientMock: NetworkClientProtocol, Sendable {
     public let urlSession: URLSession
     public let fallbackToURLSessionIfNoMatchingMock: Bool
 
-    /// All mutable state is stored in this actor for concurrency safety.
-    private let store = MockedRequestsStore()
-
     // MARK: - Init
 
     public init(urlSession: URLSession = .shared, fallbackToURLSessionIfNoMatchingMock: Bool = false) {
@@ -43,11 +40,11 @@ public final class NetworkClientMock: NetworkClientProtocol, Sendable {
         _ request: Request,
         delegate: (any URLSessionTaskDelegate)? = nil
     ) async throws -> NetworkResponse<Request.Output> where Request.Output: Sendable {
-        if let output = try await store.handleMockedRequest(for: request) {
+        if let mockedRequest = await NetworkRequestMockStore.shared.mockedRequest(for: request) {
             // swift-format-ignore
             return NetworkResponse(
-                output: output,
-                url: URL(string: "https://apple.com")!,
+                output: try mockedRequest.transform(request),
+                url: try request.makeURL(),
                 response: HTTPResponse(status: .ok, headerFields: HTTPFields()),
                 networkingDuration: 0.00,
                 processingDuration: 0.00
@@ -79,21 +76,6 @@ public final class NetworkClientMock: NetworkClientProtocol, Sendable {
         Request.NetworkTask {
             try await self.response(request, delegate: delegate)
         }
-    }
-
-    // MARK: - Mocking
-
-    /// Removes all registered mocks.
-    public func removeAllMocks() async {
-        await store.removeAllMocks()
-    }
-
-    /// Registers a mock handler for a specific request type.
-    public func mockRequest<Request: NetworkRequest>(
-        ofType type: Request.Type,
-        handler: @escaping @Sendable (Request) async throws -> Request.Output
-    ) async where Request.Output: Sendable {
-        await store.mockRequest(ofType: type, handler: handler)
     }
 
 }

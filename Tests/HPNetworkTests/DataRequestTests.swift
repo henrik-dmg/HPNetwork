@@ -51,7 +51,9 @@ final class DataRequestTests: XCTestCase {
     // MARK: - Helpers
 
     private func mockNetworkRequest(url: URL, dataToReturn data: Data?) {
-        MockedRequestStore.shared.mockRequest(to: url, ignoresQuery: false) { _ in
+        URLRequestMockStore.shared.mockRequests { request in
+            request.url == url
+        } handler: { _ in
             let response = HTTPURLResponse(
                 url: url,
                 statusCode: 200,
