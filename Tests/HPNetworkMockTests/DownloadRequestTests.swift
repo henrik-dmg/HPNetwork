@@ -44,14 +44,10 @@ final class DownloadRequestTests: XCTestCase {
         mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
 
         let request = BasicDownloadRequest(url: url)
-        switch await networkClient.result(request) {
-        case .success(let response):
-            fileURL = response.output
-            let downloadedContents = try String(contentsOf: response.output)
-            XCTAssertEqual(downloadedContents, jsonString)
-        case .failure(let error):
-            throw error
-        }
+        let response = try await networkClient.result(request).get()
+        fileURL = response.output
+        let downloadedContents = try String(contentsOf: response.output)
+        XCTAssertEqual(downloadedContents, jsonString)
     }
 
     func testBasicRequest_Completion() async throws {

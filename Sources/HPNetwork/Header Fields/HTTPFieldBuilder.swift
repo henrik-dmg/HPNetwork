@@ -4,28 +4,34 @@ import HTTPTypes
 @resultBuilder
 public enum HTTPFieldBuilder {
 
-    public static func buildBlock(_ components: [HTTPField]...) -> [HTTPField] {
-        components.flatMap { $0 }
-    }
+    // MARK: - Expression
 
-    public static func buildOptional(_ component: [HTTPField]?) -> [HTTPField] {
-        component ?? []
-    }
-
-    public static func buildOptional(_ component: [HTTPField?]?) -> [HTTPField] {
-        component?.compactMap { $0 } ?? []
-    }
-
-    /// Add support for both single and collections of constraints.
     public static func buildExpression(_ expression: HTTPField) -> [HTTPField] {
         [expression]
+    }
+
+    public static func buildExpression(_ expression: HTTPField?) -> [HTTPField] {
+        expression.flatMap { [$0] } ?? []
     }
 
     public static func buildExpression(_ expression: [HTTPField]) -> [HTTPField] {
         expression
     }
 
-    /// Add support for if statements.
+    // MARK: - Optional
+
+    public static func buildOptional(_ component: [HTTPField]?) -> [HTTPField] {
+        component ?? []
+    }
+
+    // MARK: - Limited Availability
+
+    public static func buildLimitedAvailability(_ component: [HTTPField]) -> [HTTPField] {
+        component
+    }
+
+    // MARK: - Branching
+
     public static func buildEither(first components: [HTTPField]) -> [HTTPField] {
         components
     }
@@ -34,12 +40,14 @@ public enum HTTPFieldBuilder {
         components
     }
 
-    public static func buildArray(_ components: [[HTTPField]]) -> [HTTPField] {
-        components.flatMap { $0 }
+    // MARK: - Partial
+
+    public static func buildPartialBlock(first components: [HTTPField]) -> [HTTPField] {
+        components
     }
 
-    public static func buildLimitedAvailability(_ component: [HTTPField]) -> [HTTPField] {
-        component
+    public static func buildPartialBlock(accumulated: [HTTPField], next: [HTTPField]) -> [HTTPField] {
+        accumulated + next
     }
 
 }

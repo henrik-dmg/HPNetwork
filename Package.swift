@@ -41,6 +41,10 @@ let package = Package(
         ),
         .testTarget(
             name: "HPNetworkTests",
+            dependencies: ["HPNetwork"]
+        ),
+        .testTarget(
+            name: "HPNetworkMockTests",
             dependencies: ["HPNetwork", "HPNetworkMock"]
         ),
     ]

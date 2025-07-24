@@ -24,7 +24,7 @@ public protocol DataRequest<Output>: NetworkRequest {
     ///   - delegate: The delegate to use
     /// - Returns: The network response containing the converted output along with some metadata
     /// - Throws: If the networking failed or converting the response to the desired output type failed
-    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
+    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> Response
 
     /// Executes the request and returns the result.
     /// - Parameters:
@@ -46,10 +46,8 @@ public protocol DataRequest<Output>: NetworkRequest {
 
 extension DataRequest {
 
-    @discardableResult public func response(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?
-    ) async throws -> NetworkResponse<Output> {
+    @discardableResult
+    public func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> Response {
         // Make request
         let request = try makeRequest()
         // Keep track of start time
@@ -89,10 +87,8 @@ extension DataRequest {
         )
     }
 
-    @discardableResult public func result(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?
-    ) async -> NetworkResult {
+    @discardableResult
+    public func result(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async -> NetworkResult {
         do {
             let result = try await response(urlSession: urlSession, delegate: delegate)
             return .success(result)
@@ -101,10 +97,8 @@ extension DataRequest {
         }
     }
 
-    @discardableResult public func schedule(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?
-    ) -> NetworkTask where Output: Sendable {
+    @discardableResult
+    public func schedule(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) -> NetworkTask where Output: Sendable {
         NetworkTask {
             try await response(urlSession: urlSession, delegate: delegate)
         }

@@ -19,12 +19,28 @@ final class HTTPFieldBuilderTests: XCTestCase {
         XCTAssertEqual(fields, expectedFields)
     }
 
+    func testFieldBuiler_Array_Alternative() {
+        let expectedFields = [HTTPField.contentType(.applicationJSON), HTTPField.contentType(.applicationJSON)]
+        let fields = buildHTTPFields {
+            [HTTPField.contentType(.applicationJSON), HTTPField.contentType(.applicationJSON)]
+        }
+        XCTAssertEqual(fields, expectedFields)
+    }
+
+    func testFieldBuiler_LimitedAvailability() {
+        let expectedFields = [HTTPField.contentType(.applicationJSON), HTTPField.contentType(.applicationJSON)]
+        let fields = buildHTTPFields {
+            if #available(iOS 18, *) {
+                expectedFields
+            }
+        }
+        XCTAssertEqual(fields, expectedFields)
+    }
+
     func testFieldBuiler_Optional() {
         let expectedField: HTTPField? = HTTPField.contentType(.applicationJSON)
         let fields = buildHTTPFields {
-            if let expectedField {
-                expectedField
-            }
+            expectedField
         }
         XCTAssertEqual(fields, [expectedField])
     }

@@ -6,9 +6,9 @@
 
 ## Installation
 
-Starting with v4 HPNetwork is only available via Swift Package Manager.
+`HPNetwork` is available via Swift Package Manager:
 
-- Package.swift: `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "4.0.0")`
+- Package.swift: `.package(url: "https://github.com/henrik-dmg/HPNetwork", from: "5.0.0")`
 - Xcode: `https://github.com/henrik-dmg/HPNetwork`
 
 ## Documentation

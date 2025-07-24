@@ -1,6 +1,10 @@
 import Foundation
 import HPNetwork
 
+enum URLError: Error {
+    case urlNil
+}
+
 // periphery:ignore
 struct BasicDecodableRequest<Output: Decodable>: DecodableRequest {
 

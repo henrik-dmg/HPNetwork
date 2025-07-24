@@ -10,11 +10,14 @@ public protocol NetworkRequest<Output>: Sendable {
     /// The expected output type returned in the network request.
     associatedtype Output
 
+    /// The typed ``NetworkResponse``
+    typealias Response = NetworkResponse<Output>
+
     /// The result of a network request.
-    typealias NetworkResult = Result<NetworkResponse<Output>, Error>
+    typealias NetworkResult = Result<Response, Error>
 
     /// A typed task of a network request.
-    typealias NetworkTask = Task<NetworkResponse<Output>, Error>
+    typealias NetworkTask = Task<Response, Error>
 
     /// The header fields that will be send with the network request.
     ///
@@ -45,7 +48,7 @@ public protocol NetworkRequest<Output>: Sendable {
     ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
     /// - Throws: Throws an error when anything went wrong while executing the network request
-    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> NetworkResponse<Output>
+    func response(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) async throws -> Response
 
     /// Uses all the provided information to create a `URLRequest` and handles that request's result accordingly.
     /// - Parameters:
@@ -60,10 +63,7 @@ public protocol NetworkRequest<Output>: Sendable {
     ///   - urlSession: The `URLSession` instance to use to execute this network request
     ///   - delegate: The delegate that can be used to inspect and react to the network traffic while the request is running
     /// - Returns: A task that wraps the running network request
-    func schedule(
-        urlSession: URLSession,
-        delegate: (any URLSessionTaskDelegate)?
-    ) -> NetworkTask
+    func schedule(urlSession: URLSession, delegate: (any URLSessionTaskDelegate)?) -> NetworkTask
 
     /// A method that can be used to validate the response of a network request before any further processing will be attempted.
     ///
@@ -145,7 +145,8 @@ extension NetworkRequest {
     /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: a wrapper object containing an instance of ``Output`` along with the elapsed time for both networking and processing in seconds
     /// - Throws: Throws an error when anything went wrong while executing the network request
-    public func response(urlSession: URLSession) async throws -> NetworkResponse<Output> {
+    @discardableResult
+    public func response(urlSession: URLSession) async throws -> Response {
         try await response(urlSession: urlSession, delegate: nil)
     }
 
@@ -153,6 +154,7 @@ extension NetworkRequest {
     /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: a result with either a wrapper object containing an instance of ``Output`` along with the elapsed time for
     /// both networking and processing in seconds or an error
+    @discardableResult
     public func result(urlSession: URLSession) async -> NetworkResult {
         await result(urlSession: urlSession, delegate: nil)
     }
@@ -160,6 +162,7 @@ extension NetworkRequest {
     /// Uses all the provided information to create a `URLRequest` and schedules that request.
     /// - Parameter urlSession: The `URLSession` instance to use to execute this network request
     /// - Returns: A task that wraps the running network request
+    @discardableResult
     public func schedule(urlSession: URLSession) -> NetworkTask {
         schedule(urlSession: urlSession, delegate: nil)
     }

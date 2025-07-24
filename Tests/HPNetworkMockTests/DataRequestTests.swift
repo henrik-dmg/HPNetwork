@@ -32,12 +32,8 @@ final class DataRequestTests: XCTestCase {
         mockNetworkRequest(url: url, dataToReturn: "{}".data(using: .utf8))
 
         let request = BasicDecodableRequest<EmptyStruct>(url: url)
-        switch await networkClient.result(request) {
-        case .success(let response):
-            XCTAssertEqual(response.output, EmptyStruct())
-        case .failure(let error):
-            throw error
-        }
+        let response = try await networkClient.result(request).get()
+        XCTAssertEqual(response.output, EmptyStruct())
     }
 
     func testBasicRequest_Completion() async throws {
