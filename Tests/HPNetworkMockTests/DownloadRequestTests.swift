@@ -21,6 +21,11 @@ final class DownloadRequestTests: XCTestCase {
 
     // MARK: - Test Lifecycle
 
+    override func setUp() {
+        super.setUp()
+        URLRequestMockStore.shared.removeAllMocks()
+    }
+
     override func tearDownWithError() throws {
         if let fileURL {
             try FileManager.default.removeItem(at: fileURL)

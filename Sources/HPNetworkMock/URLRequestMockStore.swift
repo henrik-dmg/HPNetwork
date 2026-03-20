@@ -28,6 +28,12 @@ public final class URLRequestMockStore: Sendable {
         }
     }
 
+    public func removeAllMocks() {
+        mockedURLRequests.withLock { requests in
+            requests.removeAll()
+        }
+    }
+
     func mockedRequest(for request: URLRequest) -> URLRequestFilter? {
         mockedURLRequests.withLock { requests in
             requests.first { filter in

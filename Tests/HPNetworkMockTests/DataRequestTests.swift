@@ -10,6 +10,11 @@ final class DataRequestTests: XCTestCase {
 
     let url = URL(string: "https://ipapi.co/json")!
 
+    override func setUp() {
+        super.setUp()
+        URLRequestMockStore.shared.removeAllMocks()
+    }
+
     lazy var mockedURLSession: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [URLSessionMock.self]

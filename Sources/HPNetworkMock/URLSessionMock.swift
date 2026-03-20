@@ -44,6 +44,7 @@ public final class URLSessionMock: URLProtocol {
             client?.urlProtocolDidFinishLoading(self)
         } catch {
             XCTFail("No response returned for url \"\(request)\"")
+            client?.urlProtocol(self, didFailWithError: error)
         }
     }
 
