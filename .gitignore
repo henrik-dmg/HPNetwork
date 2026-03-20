@@ -8,3 +8,4 @@ icon-configuration.json
 .vscode
 /coverage
 docs/
+/.claude/settings.local.json
