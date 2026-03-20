@@ -1,21 +1,24 @@
-import XCTest
+import Foundation
+import Testing
 
 @testable import HPNetwork
 
-final class NetworkRequestTests: XCTestCase {
+@Suite struct NetworkRequestTests {
 
-    func testNetworkRequest_HasAuthorizationHeaderField_WhenSpecified() throws {
+    @Test func networkRequest_HasAuthorizationHeaderField_WhenSpecified() throws {
         let request = BasicDataRequest(
             url: URL(string: "https://google.com"),
             authorization: BasicAuthorization(username: "henrik", password: "admin")
         )
         let urlRequest = try request.makeRequest()
-        XCTAssertNotNil(urlRequest.allHTTPHeaderFields?["Authorization"])
+        #expect(urlRequest.allHTTPHeaderFields?["Authorization"] != nil)
     }
 
-    func testNetworkRequest_ThrowsError_WhenURLIsNil() throws {
+    @Test func networkRequest_ThrowsError_WhenURLIsNil() throws {
         let request = FaultyRequest()
-        XCTAssertThrowsError(try request.makeRequest())
+        #expect(throws: (any Error).self) {
+            try request.makeRequest()
+        }
     }
 
 }

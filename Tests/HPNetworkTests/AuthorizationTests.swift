@@ -1,19 +1,19 @@
-import XCTest
+import Testing
 
 @testable import HPNetwork
 
-final class AuthorizationTests: XCTestCase {
+@Suite struct AuthorizationTests {
 
-    func testBasicAuthorization() throws {
+    @Test func basicAuthorization() throws {
         let auth = BasicAuthorization(username: "henrik", password: "admin")
-        let encodedString = try XCTUnwrap("henrik:admin".data(using: .utf8)?.base64EncodedString())
+        let encodedString = try #require("henrik:admin".data(using: .utf8)?.base64EncodedString())
         let expectedString = "Basic \(encodedString)"
-        XCTAssertEqual(auth?.headerString, expectedString)
+        #expect(auth?.headerString == expectedString)
     }
 
-    func testBearerAuthorization() {
+    @Test func bearerAuthorization() {
         let auth = BearerAuthorization("someToken")
-        XCTAssertEqual(auth.headerString, "Bearer someToken")
+        #expect(auth.headerString == "Bearer someToken")
     }
 
 }

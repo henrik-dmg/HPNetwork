@@ -1,82 +1,89 @@
-import XCTest
+import Foundation
+import Testing
 
 @testable import HPNetwork
 @testable import HPNetworkMock
 
-@available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
-final class DownloadRequestTests: XCTestCase {
+@Suite(.serialized) class DownloadRequestTests {
 
     // MARK: - Properties
 
-    private lazy var networkClient = NetworkClient(urlSession: mockedURLSession)
-    private lazy var mockedURLSession: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [URLSessionMock.self]
-        return URLSession(configuration: configuration)
-    }()
-
-    private let url = URL(string: "https://ipapi.co/json")!
+    private let url: URL
     private let jsonString = "{}"
     private var fileURL: URL?
 
     // MARK: - Test Lifecycle
 
-    override func setUp() {
-        super.setUp()
-        URLRequestMockStore.shared.removeAllMocks()
+    init() throws {
+        url = try #require(URL(string: "https://ipapi.co/json"))
     }
 
-    override func tearDownWithError() throws {
+    deinit {
         if let fileURL {
-            try FileManager.default.removeItem(at: fileURL)
+            try? FileManager.default.removeItem(at: fileURL)
         }
-        try super.tearDownWithError()
     }
 
     // MARK: - Tests
 
-    func testBasicRequest_Async() async throws {
-        mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
+    @Test func basicRequest_Async() async throws {
+        guard #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) else { return }
+        let networkClient = makeNetworkClient()
+        try mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
 
         let request = BasicDownloadRequest(url: url)
         let response = try await networkClient.response(request, delegate: nil)
         fileURL = response.output
         let downloadedContents = try String(contentsOf: response.output)
-        XCTAssertEqual(downloadedContents, jsonString)
+        #expect(downloadedContents == jsonString)
     }
 
-    func testBasicRequest_Result() async throws {
-        mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
+    @Test func basicRequest_Result() async throws {
+        guard #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) else { return }
+        let networkClient = makeNetworkClient()
+        try mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
 
         let request = BasicDownloadRequest(url: url)
         let response = try await networkClient.result(request).get()
         fileURL = response.output
         let downloadedContents = try String(contentsOf: response.output)
-        XCTAssertEqual(downloadedContents, jsonString)
+        #expect(downloadedContents == jsonString)
     }
 
-    func testBasicRequest_Completion() async throws {
-        mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
+    @Test func basicRequest_Completion() async throws {
+        guard #available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) else { return }
+        let networkClient = makeNetworkClient()
+        try mockNetworkRequest(url: url, dataToReturn: jsonString.data(using: .utf8))
 
         let request = BasicDownloadRequest(url: url)
         let response = try await networkClient.schedule(request).value
         let downloadedContents = try String(contentsOf: response.output)
-        XCTAssertEqual(downloadedContents, jsonString)
+        #expect(downloadedContents == jsonString)
     }
 
     // MARK: - Helpers
 
-    private func mockNetworkRequest(url: URL, dataToReturn data: Data?) {
-        URLRequestMockStore.shared.mockRequests { request in
-            request.url == url
-        } handler: { _ in
-            let response = HTTPURLResponse(
+    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+    private func makeNetworkClient() -> NetworkClient {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [URLSessionMock.self]
+        return NetworkClient(urlSession: URLSession(configuration: configuration))
+    }
+
+    @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
+    private func mockNetworkRequest(url: URL, dataToReturn data: Data?) throws {
+        let response = try #require(
+            HTTPURLResponse(
                 url: url,
                 statusCode: 200,
                 httpVersion: nil,
                 headerFields: ["Content-Type": ContentType.applicationJSON.rawValue]
-            )!
-            return (data ?? Data(), response)
+            )
+        )
+        URLRequestMockStore.shared.mockRequests { request in
+            request.url == url
+        } handler: { _ in
+            (data ?? Data(), response)
         }
     }
 

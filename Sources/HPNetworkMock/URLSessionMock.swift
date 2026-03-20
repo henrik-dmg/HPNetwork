@@ -2,11 +2,7 @@ import Foundation
 import HTTPTypes
 import HTTPTypesFoundation
 import Synchronization
-import XCTest
-
-#if canImport(Testing)
 import Testing
-#endif
 
 /// An error that can be thrown by ``URLSessionMock``.
 @available(macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *)
@@ -32,7 +28,7 @@ public final class URLSessionMock: URLProtocol {
 
     public override func startLoading() {
         guard let mockedRequest = URLRequestMockStore.shared.mockedRequest(for: request) else {
-            XCTFail("No mocked request configured for url \"\(request)\"")
+            Issue.record("No mocked request configured for url \"\(request)\"")
             client?.urlProtocol(self, didFailWithError: URLSessionMockError.noMockedRequest)
             return
         }
@@ -43,7 +39,7 @@ public final class URLSessionMock: URLProtocol {
             client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)
         } catch {
-            XCTFail("No response returned for url \"\(request)\"")
+            Issue.record("No response returned for url \"\(request)\"")
             client?.urlProtocol(self, didFailWithError: error)
         }
     }
