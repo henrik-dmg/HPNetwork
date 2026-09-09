@@ -1,7 +1,7 @@
 import Foundation
 
 /// A type that can schedule and handle network requests.
-public protocol NetworkClientProtocol {
+public protocol NetworkClientProtocol: Sendable {
 
     func response<Request: NetworkRequest>(
         _ request: Request,
@@ -21,7 +21,7 @@ public protocol NetworkClientProtocol {
 }
 
 /// A type that can schedule and handle network requests.
-public final class NetworkClient: NetworkClientProtocol {
+public final class NetworkClient: NetworkClientProtocol, Sendable {
 
     /// The `URLSession` instance that will be used to execute network requests.
     private let urlSession: URLSession

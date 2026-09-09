@@ -13,7 +13,7 @@ protocol MockedRequest<Request> {
 }
 
 /// A mockable network client.
-public final class NetworkClientMock: NetworkClientProtocol, Sendable {
+public final class NetworkClientMock: NetworkClientProtocol {
 
     // MARK: - Nested Types
 
